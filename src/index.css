@@ -18,6 +18,9 @@
 
   /* Color palette */
   --color-custom-red: #F33D3A;
+  --color-custom-yellow: #F9F94D;
+  --color-custom-blue: #B4D3F9;
+  --color-custom-lightred: #E95858;
 }
 
 a {
@@ -35,11 +38,6 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
 }
 
 button {

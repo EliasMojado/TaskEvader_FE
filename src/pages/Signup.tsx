@@ -1,63 +1,79 @@
+// src/pages/SignupPage.tsx
+
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { signup } from '../services/auth'
 import taskEvaderImage from '../../public/runningman.png'
 import logo from '../../public/logo.png'
 
 const SignupPage: React.FC = () => {
   const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
-  const [first_name, setFirstName] = useState('')
-  const [last_name, setLastName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // call your backend login endpoint
+    setError(null)
+    try {
+      const {} = await signup(
+        username,
+        email,
+        firstName,
+        lastName,
+        password
+      )
+      navigate('/login') 
+    } catch (err: any) {
+      setError(err.message)
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen px-4">
-
-      {/* logo area */}
+      {/* logo */}
       <div className="flex my-10 mx-10">
-        <img 
-          src={logo} 
-          alt="Task Evader Interface" 
-          className="max-h-[50px] object-contain"
-        />
+        <img src={logo} alt="Task Evader Logo" className="max-h-[50px]" />
       </div>
 
-      <div className="w-full flex flex-row justify-center gap-[10vw] mt-10">
-
-        <div className="flex flex-col gap-2 mb-6 w-full max-w-2xl px-4 h-full">
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-bold">Don't pay for stress.</h1>
-            <h1 className="text-3xl font-bold">Evade!</h1>
-            <p className="text-sm text-gray-600 text-justify mt-2">
-              Task Evader transforms your to-do list into a dynamic, multi-layered roadmap—nest unlimited subtasks within tasks, collapse branches to focus on what's important, and collaborate with teams—so you always see both the big picture and the tiniest action item at a glance.
-            </p>
-          </div>
-
+      <div className="w-full flex flex-row justify-center my-10">
+        {/* left promo */}
+        <div className="flex flex-col gap-2 w-full max-w-2xl px-4">
+          <h1 className="text-3xl font-bold">Don't pay for stress.</h1>
+          <h1 className="text-3xl font-bold">Evade!</h1>
+          <p className="text-sm text-gray-600 mt-2 w-[75%]">
+            Task Evader transforms your to-do list into a dynamic, multi-layered
+            roadmap—nest unlimited subtasks, collapse branches, and collaborate
+            seamlessly.
+          </p>
           <div className="mt-10 w-full flex justify-end">
-            <img 
-              src={taskEvaderImage} 
-              alt="Task Evader Interface" 
-              className="max-h-[250px] object-contain"
+            <img
+              src={taskEvaderImage}
+              alt="Task Evader UI"
+              className="max-h-[250px]"
             />
           </div>
         </div>
 
-        <div className="w-full max-w-md p-6 rounded-lg border border-black flex flex-col justify-between">
-          <h2 className="text-2xl mb-4 font-bold">Sign Up</h2>
+        {/* form */}
+        <div className="w-full max-w-md p-6 rounded-lg border flex flex-col">
+          <h2 className="text-2xl mb-4 font-bold text-center">Sign Up</h2>
+
+          {error && (
+            <div className="mb-4 text-red-600 text-center">{error}</div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
-              type="username"
+              type="text"
               placeholder="Username"
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
-              className="p-2 border rounded bg-white text-black"
+              className="p-2 border rounded bg-white"
             />
             <input
               type="email"
@@ -65,23 +81,23 @@ const SignupPage: React.FC = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="p-2 border rounded bg-white text-black"
+              className="p-2 border rounded bg-white"
             />
             <input
-              type="first_name"
+              type="text"
               placeholder="First Name"
-              value={first_name}
+              value={firstName}
               onChange={e => setFirstName(e.target.value)}
               required
-              className="p-2 border rounded bg-white text-black"
+              className="p-2 border rounded bg-white"
             />
             <input
-              type="last_name"
+              type="text"
               placeholder="Last Name"
-              value={last_name}
+              value={lastName}
               onChange={e => setLastName(e.target.value)}
               required
-              className="p-2 border rounded bg-white text-black"
+              className="p-2 border rounded bg-white"
             />
             <input
               type="password"
@@ -89,7 +105,7 @@ const SignupPage: React.FC = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              className="p-2 border rounded bg-white text-black"
+              className="p-2 border rounded bg-white"
             />
 
             <button
@@ -100,17 +116,14 @@ const SignupPage: React.FC = () => {
             </button>
           </form>
 
-          <div className="flex flex-row items-center justify-center mt-10 gap-1">
-            <span>Already signed up?</span>
-            <Link to="/login" className="text-green-500 underline ml-1">
+          <p className="mt-6 text-center text-sm">
+            Already have an account?{' '}
+            <Link to="/login" className="text-green-500 underline">
               Log In
             </Link>
-          </div>
-                    
+          </p>
         </div>
       </div>
-
-      
     </div>
   )
 }

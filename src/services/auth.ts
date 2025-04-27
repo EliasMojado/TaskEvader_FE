@@ -26,18 +26,26 @@ export async function login(
 
 export async function signup(
   username: string,
+  email: string,
+  first_name: string,
+  last_name: string,
   password: string
 ): Promise<AuthResponse> {
-  const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+
+  const display_name = `${first_name} ${last_name}`
+
+  const res = await fetch(`${API_BASE_URL}/api/register/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({
+      username,
+      email,
+      first_name,
+      last_name,
+      password,
+      display_name,
+    }),
   })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.message || 'Signup failed')
-  }
-
+  if (!res.ok) throw new Error((await res.json()).message || 'Signup failed')
   return res.json()
 }

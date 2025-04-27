@@ -7,6 +7,9 @@ export default {
     extend: {
       colors: {
         'custom-red' : 'var(--color-custom-red)',
+        'custom-blue' : 'var(--color-custom-blue)',
+        'custom-yellow' : 'var(--color-custom-yellow)',
+        'custom-lightred' : 'var(--color-custom-lightred)',
       },
     },
   },

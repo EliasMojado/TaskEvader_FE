@@ -39,13 +39,13 @@ const LoginPage: React.FC = () => {
         />
       </div>
 
-      <div className="w-full flex flex-row justify-center gap-[10vw] mt-10">
+      <div className="w-full flex flex-row justify-center my-10">
 
-        <div className="flex flex-col gap-2 mb-6 w-full max-w-2xl px-4 h-full">
+        <div className="flex flex-col mb-6 w-full max-w-2xl px-4 h-full">
           <div className="flex flex-col">
             <h1 className="text-3xl font-bold">Don't pay for stress.</h1>
             <h1 className="text-3xl font-bold">Evade!</h1>
-            <p className="text-sm text-gray-600 text-justify mt-2">
+            <p className="text-sm text-gray-600 text-justify mt-2 w-[75%]">
               Task Evader transforms your to-do list into a dynamic, multi-layered roadmap—nest unlimited subtasks within tasks, collapse branches to focus on what's important, and collaborate with teams—so you always see both the big picture and the tiniest action item at a glance.
             </p>
           </div>
