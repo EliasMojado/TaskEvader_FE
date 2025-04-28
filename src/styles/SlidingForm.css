@@ -1,0 +1,239 @@
+/* SlidingForm.css */
+
+.sliding-form {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 600px;
+  height: 100%;
+  background-color: white;
+  border-left: 2px solid #ccc;
+  padding: 20px 40px; /* Add more horizontal padding for cleaner look */
+  z-index: 1000;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Important if the form becomes long */
+  transition: right 0.3s ease;
+}
+
+
+  /* SlidingForm.css */
+
+/* Add custom styles for the datetime input */
+.sliding-form input[type="text"],
+.sliding-form input[type="datetime-local"],
+.sliding-form textarea {
+    width: 100%;
+    margin-bottom: 20px; /* More space between fields */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px; /* Smoother corners */
+    box-sizing: border-box;
+}
+.sliding-form textarea {
+    min-height: 120px;
+}
+
+.sliding-form h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.sliding-form p {
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+  
+.sliding-form .buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.sliding-form .buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sliding-form .buttons button.cancel {
+  background-color: #ccc;
+  color: white;
+}
+
+.sliding-form .buttons button.save {
+  background-color: #4caf50;
+  color: white;
+}
+
+  
+
+.assigned-users {
+  margin-top: 20px;
+}
+
+.assigned-users h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+
+  /* SlidingForm.css */
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.collaborator-item img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.collaborators-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.add-collaborator-btn {
+  background-color: #fefeff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* SlidingForm.css */
+
+/* Styles for collaborator section */
+.collaborators {
+  margin-top: 30px;
+}
+
+.collaborator-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.collaborator-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+  
+  
+  .add-collaborator-btn:hover {
+    background-color: #b4d4f9;
+  }
+  
+  /* Modal styles */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .collaborator-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .collaborator-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .collaborator-item button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .collaborator-item button:hover {
+    background-color: #0056b3;
+  }
+  
+  .close-modal-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .close-modal-btn:hover {
+    background-color: #e53935;
+  }
+  
+/* plus button */
+.plus-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
