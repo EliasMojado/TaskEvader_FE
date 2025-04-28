@@ -146,7 +146,11 @@ const Home: React.FC = () => {
                 />
 
                 {profile && (
-                    <div>
+                    <div
+                        className='cursor-pointer'
+                        onClick={() => navigate('/profile')}
+                        title='Go to Profile'
+                    >
                         <img 
                             src={profile.profile_pic} 
                             alt="Profile Picture" 
