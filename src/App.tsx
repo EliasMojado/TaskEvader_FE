@@ -4,6 +4,7 @@ import SignupPage from './pages/Signup'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import ChangePassword from './pages/ChangePassword'
+import Main from './pages/Main'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/home" element={<Home/>} />
         <Route path="/profile" element={<Profile/>} />
         <Route path="/change-password" element={<ChangePassword/>} />
+        <Route path="/main/:id" element ={<Main/>} />
       </Routes>
     </div>
   )

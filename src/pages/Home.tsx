@@ -214,6 +214,7 @@ const Home: React.FC = () => {
                             <div 
                                 key={node.id} 
                                 className={`p-4 rounded-lg border border-black`}
+                                onClick={() => navigate(`/main/${node.id}`)}
                             >
                                 <div className="flex items-center mb-2">
                                     <h1 className="text-xl flex-grow">{node.title}</h1>
