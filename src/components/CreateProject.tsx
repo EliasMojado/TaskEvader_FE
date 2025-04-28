@@ -11,31 +11,30 @@ const allUsers: User[] = [
   { id: 4, name: "David", avatar: "https://i.pravatar.cc/150?u=david" }
 ];
 
-interface SlidingFormProps {
-  task: Task | null;
+interface ProjectFormProps {
   onClose: () => void;
 }
 
-const SlidingForm: React.FC<SlidingFormProps> = ({ task, onClose }) => {
-  const [subtaskTitle, setSubtaskTitle] = useState("");
-  const [subtaskDescription, setSubtaskDescription] = useState("");
+const ProjectForm: React.FC<ProjectFormProps> = ({ onClose }) => {
+  const [projectTitle, setProjectTitle] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
   const [dueDate, setDueDate] = useState<string>("");
   const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleCreate = () => {
-    if (task && subtaskTitle) {
-      const newSubtask: Task = {
-        id: Date.now(), // simple ID generation; you might replace this later
-        name: subtaskTitle,
+    if (projectTitle) {
+      const newProject: Task = {
+        id: Date.now(),
+        name: projectTitle,
         dueDate,
         isCompleted: false,
         assignedUsers,
         subtasks: []
       };
-      console.log("Created Subtask:", newSubtask);
-      // Here, you might want to actually update the parent's subtasks list
+      console.log("Created Project:", newProject);
+      // Here, you might want to actually save the new project somewhere
       onClose();
     }
   };
@@ -61,18 +60,17 @@ const SlidingForm: React.FC<SlidingFormProps> = ({ task, onClose }) => {
 
   return (
     <div className="sliding-form">
-      <h2>Add Subtask</h2>
-      <p>Parent Task: {task?.name}</p>
+      <h2>Create Project</h2>
       <input
         type="text"
-        placeholder="Subtask Title"
-        value={subtaskTitle}
-        onChange={(e) => setSubtaskTitle(e.target.value)}
+        placeholder="Project Title"
+        value={projectTitle}
+        onChange={(e) => setProjectTitle(e.target.value)}
       />
       <textarea
-        placeholder="Subtask Description (optional)"
-        value={subtaskDescription}
-        onChange={(e) => setSubtaskDescription(e.target.value)}
+        placeholder="Project Description (optional)"
+        value={projectDescription}
+        onChange={(e) => setProjectDescription(e.target.value)}
       />
       <input
         type="datetime-local"
@@ -95,19 +93,20 @@ const SlidingForm: React.FC<SlidingFormProps> = ({ task, onClose }) => {
             </div>
           ))}
           <button onClick={() => setShowModal(true)} className="add-collaborator-btn">
-            <img src={plus} alt="Add" className="plus-icon" />
+            {/* <img src={plus} alt="Add" className="plus-icon" /> */}
+            +
           </button>
         </div>
       </div>
 
       <div className="buttons">
-        <button onClick={onClose}>Cancel</button>
-        <button onClick={handleCreate}>Create</button>
+        <button onClick={onClose} className="cancel">Cancel</button>
+        <button onClick={handleCreate} className="save">Create</button>
       </div>
 
       {/* Modal for selecting users */}
       {showModal && (
-        <div className="modal">
+        <div className="modal-overlay">
           <div className="modal-content">
             <h3>Select Users</h3>
             <input
@@ -141,4 +140,4 @@ const SlidingForm: React.FC<SlidingFormProps> = ({ task, onClose }) => {
   );
 };
 
-export default SlidingForm;
+export default ProjectForm;

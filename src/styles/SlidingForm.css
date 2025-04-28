@@ -6,7 +6,6 @@
   right: 0;
   width: 600px;
   height: 100%;
-  background-color: white;
   border-left: 2px solid #ccc;
   padding: 20px 40px; /* Add more horizontal padding for cleaner look */
   z-index: 1000;
@@ -29,6 +28,8 @@
     border: 1px solid #ccc;
     border-radius: 6px; /* Smoother corners */
     box-sizing: border-box;
+    background-color: #fefeff;
+    color:black
 }
 .sliding-form textarea {
     min-height: 120px;
@@ -61,13 +62,13 @@
 }
 
 .sliding-form .buttons button.cancel {
-  background-color: #ccc;
-  color: white;
+  background-color: #dcdcdc;
+  color: black;
 }
 
 .sliding-form .buttons button.save {
-  background-color: #4caf50;
-  color: white;
+  background-color: #f9f94d;
+  color: black;
 }
 
   
@@ -85,7 +86,7 @@
 
   /* SlidingForm.css */
 
-/* Modal styles */
+/* Modal overlay (ensure it fills the entire screen) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -95,16 +96,21 @@
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  align-items: center; /* Centers the modal vertically */
+  z-index: 1001;
 }
 
+/* Modal content centered in the viewport */
 .modal-content {
-  background: white;
+  background-color: white;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative; /* For positioning close button */
+  z-index: 1002; /* Ensure it's above the overlay */
 }
 
 .collaborator-item img {
@@ -122,9 +128,8 @@
 
 .add-collaborator-btn {
   background-color: #fefeff;
-  color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 100%;
   width: 30px;
   height: 30px;
   cursor: pointer;
@@ -134,11 +139,6 @@
 }
 
 
-.buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-}
 
 /* SlidingForm.css */
 
@@ -178,14 +178,6 @@
     justify-content: center;
     align-items: center;
     z-index: 1001;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
   .search-input {

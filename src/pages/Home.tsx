@@ -3,6 +3,7 @@ import { getUserProfile, UserProfile, getUserProfileById, CollaboratorProfile } 
 import { getRootNodes, Node } from '../services/nodes';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../public/logo.png';
+import CreateProject from '../components/CreateProject'; // Import the CreateProject component
 
 // Define status type for better type safety
 type Status = 'all' | 'ongoing' | 'missed' | 'completed';
@@ -21,6 +22,7 @@ const Home: React.FC = () => {
     const [nodesLoading, setNodesLoading] = useState<boolean>(true);
     const [nodesError, setNodesError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const [showCreateProject, setShowCreateProject] = useState(false); // New state!
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -164,7 +166,13 @@ const Home: React.FC = () => {
                 <h1 className="text-3xl mb-6 font-bold">Ready to get productive today{profile?.display_name ? `, ${profile.display_name} ?` : `, ${profile?.username}`}</h1>
                 <h2 className="text-xl italic text-gray-500">Jump right in to one of your projects.</h2>
                 <h2 className="text-l italic text-gray-500">or</h2>
-                <h2 className="text-xl mb-2 italic text-gray-700 underline">Create a new one.</h2>
+                {/* Wrap "Create a new one" in a clickable div */}
+                <div 
+                    className="text-xl mb-2 italic text-gray-700 underline cursor-pointer"
+                    onClick={() => setShowCreateProject(true)} // <-- Open the panel
+                >
+                    Create a new one.
+                </div>
             </div>
             
             <div className='flex flex-row gap-4 mt-10 mb-8 justify-center'>
@@ -323,6 +331,28 @@ const Home: React.FC = () => {
                     </div>
                 )}
             </div>
+            <div 
+                className={`
+                    fixed top-0 right-0 h-full w-[600px] bg-white shadow-lg 
+                    transition-all duration-500 z-50
+                    ${showCreateProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+                    ${showCreateProject ? 'pointer-events-auto' : 'pointer-events-none'}
+                `}
+            >
+                <CreateProject 
+                    onClose={() => setShowCreateProject(false)}
+                />
+            </div>
+
+
+            {/* Dim background */}
+            {showCreateProject && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    onClick={() => setShowCreateProject(false)}
+                />
+            )}
+
         </div>
     );
 };
