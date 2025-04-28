@@ -59,6 +59,7 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s; /* Adds smooth transition */
 }
 
 .sliding-form .buttons button.cancel {
@@ -70,6 +71,13 @@
   background-color: #f9f94d;
   color: black;
 }
+
+/* Hover effect for buttons */
+.sliding-form .buttons button:hover {
+  transform: scale(1.05); /* Enlarges the button */
+  opacity: 0.9; /* Makes the button slightly dimmer */
+}
+
 
   
 
