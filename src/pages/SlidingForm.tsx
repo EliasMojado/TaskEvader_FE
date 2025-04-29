@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Task, User } from "../data/types";
 import "../styles/SlidingForm.css";
-import plus from '../assets/plus.png';
+import plus from '../../public/plus.png';
 
 // Mock available users (this would usually come from a backend or props)
 const allUsers: User[] = [

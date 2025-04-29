@@ -20,6 +20,13 @@ export interface CompleteUserProfile {
   email?: string;
 }
 
+export interface PublicUserProfile {
+  id: number;
+  display_name: string;
+  email: string;
+  profile_pic: string | null;
+}
+
 export const getUserProfile = async (): Promise<UserProfile> => {
   const token = localStorage.getItem('authToken');
   
@@ -167,5 +174,62 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   } catch (error: any) {
     console.error('Error changing password:', error);
     throw new Error(error.message || 'Failed to change password');
+  }
+};
+
+export const getAllUserProfiles = async (): Promise<PublicUserProfile[]> => {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/user-profiles/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error('Error fetching all user profiles:', error);
+    throw new Error(error.message || 'Failed to fetch all user profiles');
+  }
+};
+
+
+export const searchUsers = async (query: string): Promise<PublicUserProfile[]> => {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    throw new Error("Authentication token not found");
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/search-users/?q=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch search results (status: ${response.status})`);
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    console.error("Search error:", error);
+    throw new Error(error.message || "Failed to search users");
   }
 };
