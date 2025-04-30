@@ -1,0 +1,276 @@
+import React, {JSX, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {STATUS} from "../constants/index.ts";
+import {
+  MdLaptop,
+  MdOutlineCheckBoxOutlineBlank,
+  MdPerson,
+  MdUnfoldLess,
+  MdUnfoldMore
+} from "react-icons/md";
+import {TbCalendarClock} from "react-icons/tb";
+import {ProgressBar, ProgressProps} from "../components/progress_bar.tsx";
+import {formatDateToLocale} from "../helpers/date_helper.ts";
+import {BiDotsVertical, BiEdit} from "react-icons/bi";
+import {IoIosCheckboxOutline, IoMdTrash} from "react-icons/io";
+import {AiFillFileAdd, AiOutlineCloseSquare} from "react-icons/ai";
+
+export type NodeData = {
+  id: number;
+  title: string;
+  deadline: string;
+  collaborators: CollaboratorProfile[];
+  parent: number;
+  status: string;
+  completed_subtasks: number;
+  ongoing_subtasks: number;
+  missed_subtasks: number;
+  icon_id: number;
+  children: NodeData[];
+}
+
+type Icons = {
+  [key: number]: {
+    icon_sm: JSX.Element;
+    icon_md: JSX.Element;
+    icon_lg: JSX.Element;
+  }
+}
+
+type CollaboratorProfile = {
+  display_name: string;
+  profile_pic: string | null;
+  id: number;
+}
+
+const IconsMap: Icons = {
+  1: {
+    icon_sm: <MdLaptop size={20} color={'#001F54'}/>,
+    icon_md: <MdLaptop size={40} color={'#001F54'}/>,
+    icon_lg: <MdLaptop size={65} color={'#001F54'}/>
+  },
+}
+
+export const Node: React.FC<{
+  isCollapsed?: boolean,
+  node_data: NodeData,
+  setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>
+  isHomePage?: boolean,
+  loadChildren?: () => Promise<void>
+}> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren}) => {
+  const [hovered, setHovered] = useState<boolean>(false);
+  const [showOptions, setShowOptions] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const key = node_data.id;
+  const isLeaf = !(node_data.completed_subtasks || node_data.ongoing_subtasks || node_data.missed_subtasks);
+
+  const handleToggleCollapse = () => {
+    if (setIsCollapsed && !isLeaf) {
+      setIsCollapsed(!isCollapsed);
+    }
+  };
+
+  return (
+      <main
+          onClick={() => {
+            if (isHomePage) {
+              navigate(`/main/${key}`);
+            } else {
+              if (!isCollapsed && node_data.children.length > 0) {
+                loadChildren?.();
+              }
+              handleToggleCollapse();
+            }
+          }}
+          onMouseOver={() => setHovered(true)}
+          onMouseLeave={() => {
+            setHovered(false);
+            setShowOptions(false);
+          }}
+          className={`flex flex-row w-full items-center gap-2 relative border cursor-pointer hover:shadow-lg transition-all duration-200
+                    ${node_data.parent == null ? 'rounded-3xl px-6 py-4 border-palm-blue' : 'rounded-lg px-6 py-2 border-carribean-current'}`}
+      >
+        {
+          /*
+          Collapse Button Indicator,
+          will now show if the node is a leaf
+          */
+        }
+
+        {
+          !isHomePage
+            && <div className={'h-full items-center justify-center flex'}>
+              {
+                  !isLeaf && (isCollapsed
+                      ? <MdUnfoldLess size={25}/>
+                      : <MdUnfoldMore size={25}/>)
+              }
+            </div>
+        }
+
+
+        {
+          /*
+          Main Content
+            - Custom Icon
+            - Title
+            - Deadline
+            - Collaborators
+            - Progress Bar
+          */
+        }
+        <div className={'flex flex-col gap-2'}>
+          {
+            /*
+              - Custom Icon
+              - Title
+              - Deadline
+              - Collaborators
+            */
+          }
+          <div className={'flex flex-row gap-2'}>
+
+            {
+              /*
+               - Custom Icon
+              */
+            }
+
+            <div className={'flex flex-col items-center justify-center'}>
+              {node_data.parent == null ? IconsMap[node_data.icon_id].icon_lg : isLeaf ? IconsMap[node_data.icon_id].icon_sm : IconsMap[node_data.icon_id].icon_md}
+            </div>
+
+            {
+              /*
+                - Title,
+                - Deadline,
+                - Collaborators.
+                - Progress Bar
+              */
+            }
+
+            <div className={`flex ${isLeaf ? 'flex-row items-center gap-2' : 'flex-col justify-center'}`}>
+
+              {
+                /*
+                  - Title
+                  - Deadline
+                  - Collaborators
+                */
+              }
+              <div className={`flex ${node_data.parent != null ? 'flex-row items-center gap-2' : 'flex-col'}`}>
+
+                {
+                  /*
+                    - Title
+                  */
+                }
+                <h1
+                    className={`w-fit font-inter ${node_data.parent == null ? isHomePage ? 'font-bold text-l leading-none ' : 'font-extrabold text-3xl' : 'font-medium text-sm'} text-palm-blue`}
+                    style={isHomePage ? {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    } : {}}
+                >
+                  {node_data["title"]}
+                </h1>
+
+                {
+                  /*
+                    - Deadline
+                    - Collaborators
+                  */
+                }
+                <div className={'flex flex-row items-center gap-1'}>
+                  <span className={`w-fit h-fit px-4 py-0.5 whitespace-nowrap ${node_data.parent == null ? 'text-[10px]' : 'text-[7px]'} 
+                  rounded-2xl text-palm-blue bg-uranian-blue font-viga flex flex-row items-center justify-center gap-1`}>
+                    <TbCalendarClock/>
+                    <span>
+                        {formatDateToLocale(node_data['deadline'])} {node_data['deadline'].time}
+                    </span>
+                  </span>
+                  <span className={'flex flex-row'}>
+                    {node_data['collaborators'].map((profile: CollaboratorProfile) => (
+                    <div key={profile.id} className={`${node_data.parent == null ? 'w-5 h-5' : 'w-3 h-3'} rounded-full border border-white 
+                      overflow-hidden items-center justify-center flex bg-gray-300`}>
+                      <MdPerson/>
+                    </div>
+                  ))}
+                </span>
+                </div>
+              </div>
+
+              {
+                /*
+                  - Progress Bar
+                */
+              }
+              {!node_data.parent == null && !isLeaf &&
+                  <div className={'h-2'}>
+                      <ProgressBar progress={
+                        {
+                          completed: node_data.completed_subtasks,
+                          ongoing: node_data.ongoing_subtasks,
+                          missed: node_data.missed_subtasks
+                        } as ProgressProps
+                      }/>
+                  </div>
+              }
+            </div>
+          </div>
+
+          {node_data.parent == null &&
+              <div className={'h-3'}>
+                  <ProgressBar progress={
+                    {
+                      completed: node_data.completed_subtasks,
+                      ongoing: node_data.ongoing_subtasks,
+                      missed: node_data.missed_subtasks
+                    } as ProgressProps
+                  }/>
+              </div>
+          }
+        </div>
+        <div></div>
+        {isLeaf &&
+        <div>
+          {node_data.status == STATUS.ongoing &&
+              <MdOutlineCheckBoxOutlineBlank size={node_data.parent == null ? 20 : 13} color={'#001F54'}/>}
+          {node_data.status == STATUS.completed && <IoIosCheckboxOutline size={node_data.parent == null ? 20 : 13} color={'#197278'}/>}
+          {node_data.status == STATUS.missed && <AiOutlineCloseSquare size={node_data.parent == null ? 20 : 13} color={'#F33D3A'}/>}
+        </div>
+        }
+
+        {hovered &&
+        <div className={'absolute right-1 z-10'}>
+            <BiDotsVertical
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowOptions(!showOptions)
+                }}
+                onMouseLeave={() => {
+                  setHovered(false)
+                }}/>
+          {showOptions &&
+              <div className={'absolute left-1 flex flex-col gap-2 bg-white rounded-xl border shadow-lg p-4'}>
+                  <h1 className={'text-palm-blue font-inter font-bold text-sm'}>Actions</h1>
+
+                  <div className={'flex flex-row items-center gap-2'}>
+                      <AiFillFileAdd size={15} color={'#197278'}/>
+                      <span className={'text-palm-blue font-inter font-medium text-sm'}>Add</span>
+                  </div>
+                  <div className={'flex flex-row items-center gap-2'}>
+                      <BiEdit size={15} color={'#197278'}/>
+                      <span className={'text-palm-blue font-inter font-medium text-sm'}>Edit</span>
+                  </div>
+                  <div className={'flex flex-row items-center gap-2'}>
+                      <IoMdTrash size={15} color={'#FC7554'}/>
+                      <span className={'text-palm-blue font-inter font-medium text-sm'}>Delete</span>
+                  </div>
+              </div>
+          }
+        </div>
+        }
+      </main>
+  );
+};
