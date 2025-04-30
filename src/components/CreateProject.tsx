@@ -2,65 +2,83 @@ import React, { useState, useEffect } from "react";
 import { Task, User } from "../data/types"; 
 import "../styles/SlidingForm.css";
 import plus from "../../public/plus.png";
-import { searchUsers, getAllUserProfiles } from "../services/profile";
+import { searchUsers } from "../services/profile";
+import { createNode } from "../services/nodes";
 
 interface CreateProjectProps {
   onClose: () => void;
-  parentId?: number; // Optional parent task ID
+  parentId?: number;
 }
 
 const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
   const [taskTitle, setTaskTitle] = useState("");
-  const [description, setDescription] = useState(""); // <<-- Added description
+  const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<string>("");
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Medium");
-  const [status, setStatus] = useState<"On Going" | "Missed" | "Done">("On Going");
+  const [status, setStatus] = useState<"ongoing" | "missed" | "done">("ongoing");
   const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [allUsers, setAllUsers] = useState<User[]>([]); // State to store users
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [allUsers, setAllUsers] = useState<User[]>([]);
 
+  // Search user logic
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (searchTerm.trim() === "") {
-        setAllUsers([]); // optionally clear list when search is empty
+        setAllUsers([]);
         return;
       }
-  
       try {
         const users = await searchUsers(searchTerm);
         setAllUsers(users);
+        console.log("Fetched users:", users);
       } catch (err) {
         console.error("Error searching users:", err);
       }
     };
-  
     const delayDebounce = setTimeout(() => {
       fetchSearchResults();
-    }, 300); // debounce delay (ms)
-  
+    }, 300);
     return () => clearTimeout(delayDebounce);
   }, [searchTerm]);
-   // Empty dependency array means this effect runs once when the component mounts
 
-  const handleCreate = () => {
-    if (taskTitle) {
-      const newTask: Task = {
-        id: Date.now(),
-        name: taskTitle,
-        description, // <<-- Include description
-        dueDate,
-        isCompleted: status === "Done",
-        assignedUsers,
-        priority,
-        status,
-        ...(parentId !== undefined && { parent: parentId })
-      };
-      console.log("Created Task:", newTask);
+  const handleCreate = async () => {
+    if (!taskTitle) {
+      alert("Please enter a task title.");
+      return;
+    }
+  
+    // Ensure all assigned users have valid ids
+    const validAssignedUsers = assignedUsers.filter(user => user.id != null);
+    // console.log("Valid assigned users:", validAssignedUsers);
+    // if (validAssignedUsers.length === 0) {
+    //   alert("Please assign at least one valid user.");
+    //   return;
+    // }
+  
+    const payload = {
+      title: taskTitle,
+      description,
+      deadline: dueDate || null,
+      priority: priority === "High" ? 3 : priority === "Medium" ? 2 : 1,
+      // Adjust the status to match Django's expected case
+      status: status === "ongoing" ? "ongoing" : status === "done" ? "done" : "missed",
+      parent: parentId ?? null,
+      collaborators: validAssignedUsers.map((user) => user.id),
+      completed_subtasks: 0,
+    };
+  
+    try {
+      const created = await createNode(payload);
+      console.log("Successfully created node:", created);
       onClose();
+    } catch (err: any) {
+      console.error("Failed to create node:", err);
+      alert("Error: " + (err.message ?? "Unknown error"));
     }
   };
+  
+  
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -71,16 +89,13 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
       const isAlreadyAssigned = prev.some((u) => u.id === user.id);
       return isAlreadyAssigned ? prev.filter((u) => u.id !== user.id) : [...prev, user];
     });
+    console.log("Assigned users:", assignedUsers);
   };
-
-  const filteredUsers = allUsers.filter((user) =>
-    user.display_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="sliding-form">
       <h2>{parentId ? "Create Subtask" : "Create Root Task"}</h2>
-      
+
       <input
         type="text"
         placeholder="Task Title"
@@ -101,7 +116,6 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
         onChange={(e) => setDueDate(e.target.value)}
       />
 
-      {/* Priority Selector */}
       <div className="priority-selector">
         <label htmlFor="priority">Priority:</label>
         <select
@@ -115,7 +129,6 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
         </select>
       </div>
 
-      {/* Status Selector - only show if creating a subtask */}
       {parentId !== undefined && (
         <div className="status-selector">
           <label htmlFor="status">Status:</label>
@@ -123,17 +136,17 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
             id="status"
             value={status}
             onChange={(e) =>
-              setStatus(e.target.value as "On Going" | "Missed" | "Done")
+              setStatus(e.target.value as "ongoing" | "missed" | "done")
             }
           >
-            <option value="On Going">On Going</option>
-            <option value="Missed">Missed</option>
-            <option value="Done">Done</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="missed">Missed</option>
+            <option value="done">Done</option>
           </select>
         </div>
       )}
 
-      {/* Assigned Users */}
+
       <div className="assigned-users">
         <h3>Assigned Users</h3>
         <div className="collaborator-list">
@@ -159,7 +172,6 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
         <button onClick={handleCreate} className="save">Create</button>
       </div>
 
-      {/* Modal for selecting users */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">

@@ -227,9 +227,15 @@ export const searchUsers = async (query: string): Promise<PublicUserProfile[]> =
       throw new Error(`Failed to fetch search results (status: ${response.status})`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Log the data to the console to see what you're getting
+    console.log("Search results:", data);
+    
+    return data;
   } catch (error: any) {
     console.error("Search error:", error);
     throw new Error(error.message || "Failed to search users");
   }
 };
+
