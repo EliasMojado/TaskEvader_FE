@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../constants';
+import {getUserProfileById} from "./profile.ts";
 
 export interface Node {
   id: number;
@@ -11,6 +12,8 @@ export interface Node {
   children: Node[];
   collaborators: number[];  // Assuming these are IDs of the collaborators
   completed_subtasks: number;
+  ongoing_subtasks: number;
+  missed_subtasks: number;
   created_at: string;
   updated_at: string;
 }
@@ -116,5 +119,30 @@ export const createNode = async (payload: CreateNodePayload): Promise<Node> => {
     console.error('Error creating node:', error);
     throw new Error(error.message || 'Failed to create node');
   }
+};
+
+export const fetchSpecificNodeWithCollaborator = async (id: number) => {
+  try {
+    // Fetch basic root nodes
+    const node = await getNodeData(id);
+
+    const collaboratorProfiles = await Promise.all(
+        node.collaborators.map(async (userId) => {
+          try {
+            return await getUserProfileById(userId);
+          } catch (err) {
+            console.error(`Failed to fetch profile for user ${userId}:`, err);
+            // Return a default profile on error
+            return { display_name: `User ${userId}`, profile_pic: null };
+          }
+        })
+    );
+
+      return { ...node, collaboratorProfiles };
+    } catch (err) {
+      console.error(`Error fetching collaborator profiles for node ${node.id}:`, err);
+      // Return node with empty collaborator profiles if fetch fails
+      return { ...node, collaboratorProfiles: [] };
+    }
 };
 
