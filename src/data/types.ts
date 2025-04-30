@@ -8,11 +8,12 @@ export interface User {
 }
 
 export type Priority = "Low" | "Medium" | "High";
-export type Status = "Not Started" | "In Progress" | "Completed";
+export type Status = "ongoing" | "missed" | "done";
 
 export interface Task {
   id: number;
   name: string;
+  description: string;
   dueDate: string;
   isCompleted: boolean;
   assignedUsers: User[];

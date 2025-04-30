@@ -7,12 +7,23 @@ export interface Node {
   deadline: string | null;
   priority: number;
   status: 'ongoing' | 'missed' | 'completed';
-  parent: number | null;
+  parent_id: number | null;
   children: Node[];
-  collaborators: number[];
+  collaborators: number[];  // Assuming these are IDs of the collaborators
   completed_subtasks: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface CreateNodePayload {
+  title: string;
+  description: string;
+  deadline: string | null;
+  priority: number;
+  status: 'ongoing' | 'missed' | 'completed';
+  parent_id?: number | null;  // Parent node ID if this node is a child of another
+  collaborators: number[];  // Assuming collaborators are specified by their IDs
+  completed_subtasks: number;  // The initial count of completed subtasks
 }
 
 export const getRootNodes = async (): Promise<Node[]> => {
@@ -73,3 +84,37 @@ export const getNodeData = async (id: number | string): Promise<Node> => {
     throw new Error(error.message || `Failed to fetch node with ID ${id}`);
   }
 };
+
+export const createNode = async (payload: CreateNodePayload): Promise<Node> => {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
+
+  console.log("Creating node with payload:", payload);  // Log the payload for debugging
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/nodes/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Error response:", errorData);  // Log the detailed error response
+      throw new Error(errorData.message || `Failed to create node (Status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error('Error creating node:', error);
+    throw new Error(error.message || 'Failed to create node');
+  }
+};
+
