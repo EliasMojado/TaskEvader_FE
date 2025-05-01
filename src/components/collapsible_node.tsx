@@ -11,7 +11,7 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }
       try {
         // Fetch all children and filter out null results (nodes user can't access)
         const fetchedChildrenResults = await Promise.all(
-          node_data.children.map((id: number) => fetchSpecificNodeWithCollaborator(id))
+          node_data.children.map((childId) => fetchSpecificNodeWithCollaborator(Number(childId)))
         );
         
         // Filter out null responses (nodes the user can't access)
