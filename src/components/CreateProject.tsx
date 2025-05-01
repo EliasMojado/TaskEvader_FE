@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Task, User } from "../data/types"; 
 import "../styles/SlidingForm.css";
 import plus from "../../public/plus.png";
@@ -23,6 +23,24 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedEmoji, setSelectedEmoji] = useState<string>("📋"); // Default emoji
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close emoji picker
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    }
+    
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
 
   // Search user logic
   useEffect(() => {
@@ -110,11 +128,14 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
         </div>
         
         {showEmojiPicker && (
-          <div className="absolute z-10 mt-2 shadow-lg border rounded-lg">
+          <div 
+            ref={emojiPickerRef}
+            className="absolute z-10 mt-2 shadow-lg border rounded-lg"
+          >
             <EmojiPicker 
               onEmojiClick={handleEmojiClick}
               skinTonesDisabled={true}
-              searchPlaceHolder=""
+              searchPlaceHolder="Search"
               lazyLoadEmojis={true}
               searchDisabled={false}
               width={350}
