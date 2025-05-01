@@ -14,6 +14,7 @@ import {formatDateToLocale} from "../helpers/date_helper.ts";
 import {BiDotsVertical, BiEdit} from "react-icons/bi";
 import {IoIosCheckboxOutline, IoMdTrash} from "react-icons/io";
 import {AiFillFileAdd, AiOutlineCloseSquare} from "react-icons/ai";
+import CreateSubtaskForm from "./CreateSubtaskForm.tsx";
 
 export type NodeData = {
   id: number;
@@ -61,9 +62,11 @@ export const Node: React.FC<{
 }> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren}) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
+  const [showCreateProject, setShowCreateProject] = useState(false);
   const navigate = useNavigate();
   const key = node_data.id;
   const isLeaf = !(node_data.completed_subtasks || node_data.ongoing_subtasks || node_data.missed_subtasks);
+  
 
   const handleToggleCollapse = () => {
     if (setIsCollapsed && !isLeaf) {
@@ -275,7 +278,8 @@ export const Node: React.FC<{
               <div className={'absolute left-1 flex flex-col gap-2 bg-white rounded-xl border shadow-lg p-4'}>
                   <h1 className={'text-palm-blue font-inter font-bold text-sm'}>Actions</h1>
 
-                  <div className={'flex flex-row items-center gap-2'}>
+                  <div className={'flex flex-row items-center gap-2 cursor-pointer'}
+                      onClick={() => setShowCreateProject(true)}>
                       <AiFillFileAdd size={15} color={'#197278'}/>
                       <span className={'text-palm-blue font-inter font-medium text-sm'}>Add</span>
                   </div>
@@ -291,6 +295,28 @@ export const Node: React.FC<{
           }
         </div>
         }
+        <div 
+                className={`
+                    fixed top-0 right-0 h-full w-[600px] bg-white shadow-lg 
+                    transition-all duration-500 z-50
+                    ${showCreateProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+                    ${showCreateProject ? 'pointer-events-auto' : 'pointer-events-none'}
+                `}
+            >
+                <CreateSubtaskForm
+                    parentNode={node_data}
+                    onClose={() => setShowCreateProject(false)}
+                />
+            </div>
+
+
+            {/* Dim background */}
+            {showCreateProject && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    onClick={() => setShowCreateProject(false)}
+                />
+            )}
       </main>
   );
 };
