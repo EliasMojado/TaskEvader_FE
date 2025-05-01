@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { NodeData } from "../components/Node";
 import { searchUsers } from "../services/profile";
 import { createNode } from "../services/nodes";
 import plus from "../../public/plus.png";
 import "../styles/SlidingForm.css";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
 interface User {
   id: number;
@@ -26,6 +27,26 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [selectedEmoji, setSelectedEmoji] = useState<string>("📋"); // Default emoji
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close emoji picker
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    }
+    
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -67,6 +88,7 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
       parent: parentNode.id,
       collaborators: validAssignedUsers.map((user) => user.id),
       completed_subtasks: 0,
+      icon: selectedEmoji, // Add the selected emoji to the payload
     };
 
     try {
@@ -90,9 +112,47 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
     });
   };
 
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setSelectedEmoji(emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
+
   return (
     <div className="sliding-form">
       <h2>Create Subtask</h2>
+
+      {/* Emoji Selector */}
+      <div className="emoji-selector mb-4">
+        <div className="flex items-center gap-2">
+          <button 
+            className="text-4xl p-2 border rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            {selectedEmoji}
+          </button>
+          <span className="text-sm text-gray-500">Click to change icon</span>
+        </div>
+        
+        {showEmojiPicker && (
+          <div 
+            ref={emojiPickerRef}
+            className="absolute z-10 mt-2 shadow-lg border rounded-lg"
+          >
+            <EmojiPicker 
+              onEmojiClick={handleEmojiClick}
+              skinTonesDisabled={true}
+              searchPlaceHolder="Search"
+              lazyLoadEmojis={true}
+              searchDisabled={false}
+              width={350}
+              height={350}
+              previewConfig={{
+                showPreview: false
+              }}
+            />
+          </div>
+        )}
+      </div>
 
       <input
         type="text"
@@ -128,19 +188,6 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
           <option value="High">High</option>
         </select>
       </div>
-
-      {/* <div className="status-selector">
-        <label htmlFor="status">Status:</label>
-        <select
-          id="status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as "ongoing" | "missed" | "done")}
-        >
-          <option value="ongoing">Ongoing</option>
-          <option value="missed">Missed</option>
-          <option value="done">Done</option>
-        </select>
-      </div> */}
 
       <div className="assigned-users">
         <h3>Assigned Users</h3>
