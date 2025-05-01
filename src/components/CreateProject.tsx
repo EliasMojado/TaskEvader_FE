@@ -68,6 +68,17 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
       alert("Please enter a task title.");
       return;
     }
+
+    if (!dueDate) {
+      alert("Please select a due date.");
+      return;
+    }
+
+    // const isInvalidDueDate = !dueDate || new Date(dueDate).getTime() === 0;
+    // if (isInvalidDueDate) {
+    //   alert("Please select a valid due date.");
+    //   return;
+    // }
   
     // Ensure all assigned users have valid ids
     const validAssignedUsers = assignedUsers.filter(user => user.id != null);
@@ -166,6 +177,8 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
         type="datetime-local"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
+        min={new Date().toISOString().slice(0, 16)} // YYYY-MM-DDTHH:MM
+        required
       />
 
       <div className="priority-selector">
