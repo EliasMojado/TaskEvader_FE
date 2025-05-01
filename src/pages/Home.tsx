@@ -5,6 +5,7 @@ import {useLocation} from 'react-router-dom';
 import logo from '../../public/logo.png';
 import CreateProject from '../components/CreateProject'; // Import the CreateProject component
 import {Node as NodeCard, NodeData} from '../components/node'; // Import the Node component
+import { useNavigate } from 'react-router-dom';
 
 // Define status type for better type safety
 type Status = 'all' | 'ongoing' | 'missed' | 'completed';
@@ -20,13 +21,15 @@ const Home: React.FC = () => {
     const location = useLocation();
     const [showCreateProject, setShowCreateProject] = useState(false); // New state!
 
+    const navigate = useNavigate();
+
     const fetchUserProfile = async () => {
         try {
             setLoading(true);
             const userProfile = await getUserProfile();
             setProfile(userProfile);
             console.log('User profile fetched successfully:', userProfile);
-        } catch (err: never) {
+        } catch (err: unknown) {
             console.error('Failed to fetch profile:', err);
             setError(err.message || 'Failed to load user profile');
 

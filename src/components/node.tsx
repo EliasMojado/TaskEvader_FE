@@ -186,7 +186,8 @@ export const Node: React.FC<{
                   rounded-2xl text-palm-blue bg-uranian-blue font-viga flex flex-row items-center justify-center gap-1`}>
                     <TbCalendarClock/>
                     <span>
-                        {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US')}
+                      {/* {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString()} */}
+                      {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US', {timeZone: 'UTC', timeZoneName: 'short'})}
                     </span>
                   </span>
                   <span className={'flex flex-row'}>
