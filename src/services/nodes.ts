@@ -121,6 +121,32 @@ export const createNode = async (payload: CreateNodePayload): Promise<Node> => {
   }
 };
 
+export const deleteNodeWithChildren = async (id: number | string): Promise<void> => {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/cascade-delete/`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to delete node (Status: ${response.status})`);
+    }
+  } catch (error: any) {
+    console.error(`Error deleting node ${id} with children:`, error);
+    throw new Error(error.message || 'Failed to delete node and its children');
+  }
+};
+
 export const fetchSpecificNodeWithCollaborator = async (id: number) => {
   try {
     // Fetch basic root nodes
