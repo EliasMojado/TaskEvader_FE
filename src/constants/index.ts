@@ -5,3 +5,9 @@ export const ROUTES = {
   SIGNUP: '/signup',
   DASHBOARD: '/dashboard',
 }
+
+export const STATUS = {
+  completed: 'completed',
+  ongoing: 'ongoing',
+  missed: 'missed',
+}

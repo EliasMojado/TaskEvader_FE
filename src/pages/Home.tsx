@@ -1,100 +1,98 @@
 import React, { useEffect, useState } from 'react';
-import { getUserProfile, UserProfile, getUserProfileById, CollaboratorProfile } from '../services/profile';
-import { getRootNodes, Node } from '../services/nodes';
-import { useNavigate } from 'react-router-dom';
+import { getUserProfile, UserProfile, getUserProfileById } from '../services/profile';
+import { getRootNodes } from '../services/nodes';
+import {useLocation} from 'react-router-dom';
 import logo from '../../public/logo.png';
 import CreateProject from '../components/CreateProject'; // Import the CreateProject component
+import {Node as NodeCard, NodeData} from '../components/node'; // Import the Node component
 
 // Define status type for better type safety
 type Status = 'all' | 'ongoing' | 'missed' | 'completed';
-
-// Define enhanced node type with collaborator profiles
-interface EnhancedNode extends Node {
-  collaboratorProfiles?: CollaboratorProfile[];
-}
 
 const Home: React.FC = () => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [status, setStatus] = useState<Status>('all'); // Default status is 'all'
-    const [nodes, setNodes] = useState<EnhancedNode[]>([]);
+    const [nodes, setNodes] = useState<NodeData[]>([]);
     const [nodesLoading, setNodesLoading] = useState<boolean>(true);
     const [nodesError, setNodesError] = useState<string | null>(null);
-    const navigate = useNavigate();
+    const location = useLocation();
     const [showCreateProject, setShowCreateProject] = useState(false); // New state!
 
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                setLoading(true);
-                const userProfile = await getUserProfile();
-                setProfile(userProfile);
-                console.log('User profile fetched successfully:', userProfile);
-            } catch (err: any) {
-                console.error('Failed to fetch profile:', err);
-                setError(err.message || 'Failed to load user profile');
-                
-                localStorage.removeItem('authToken');
-                navigate('/login');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchUserProfile = async () => {
+        try {
+            setLoading(true);
+            const userProfile = await getUserProfile();
+            setProfile(userProfile);
+            console.log('User profile fetched successfully:', userProfile);
+        } catch (err: never) {
+            console.error('Failed to fetch profile:', err);
+            setError(err.message || 'Failed to load user profile');
 
+            localStorage.removeItem('authToken');
+            navigate('/login');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchRootNodesWithCollaborators = async () => {
+        try {
+            setNodesLoading(true);
+            // Fetch basic root nodes
+            const rootNodes = await getRootNodes();
+
+            // For each node, fetch collaborator profiles
+            const enhancedNodes = await Promise.all(
+                rootNodes.map(async (node) => {
+                    // Skip if no collaborators
+                    if (!node.collaborators || node.collaborators.length === 0) {
+                        return { ...node, collaboratorProfiles: [] };
+                    }
+
+                    try {
+                        // Fetch collaborator profiles in parallel
+                        const collaboratorProfiles = await Promise.all(
+                            node.collaborators.map(async (userId) => {
+                                try {
+                                    return await getUserProfileById(userId);
+                                } catch (err) {
+                                    console.error(`Failed to fetch profile for user ${userId}:`, err);
+                                    // Return a default profile on error
+                                    return { display_name: `User ${userId}`, profile_pic: null };
+                                }
+                            })
+                        );
+
+                        return { ...node, collaboratorProfiles };
+                    } catch (err) {
+                        console.error(`Error fetching collaborator profiles for node ${node.id}:`, err);
+                        // Return node with empty collaborator profiles if fetch fails
+                        return { ...node, collaboratorProfiles: [] };
+                    }
+                })
+            );
+
+            setNodes(enhancedNodes);
+            console.log('Enhanced nodes with collaborators:', enhancedNodes);
+        } catch (err: never) {
+            console.error('Failed to fetch root nodes:', err);
+            setNodesError(err.message || 'Failed to load root nodes');
+        } finally {
+            setNodesLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchUserProfile();
-    }, [navigate]);
-
-    useEffect(() => {
-        const fetchRootNodesWithCollaborators = async () => {
-            try {
-                setNodesLoading(true);
-                // Fetch basic root nodes
-                const rootNodes = await getRootNodes();
-                
-                // For each node, fetch collaborator profiles
-                const enhancedNodes = await Promise.all(
-                    rootNodes.map(async (node) => {
-                        // Skip if no collaborators
-                        if (!node.collaborators || node.collaborators.length === 0) {
-                            return { ...node, collaboratorProfiles: [] };
-                        }
-                        
-                        try {
-                            // Fetch collaborator profiles in parallel
-                            const collaboratorProfiles = await Promise.all(
-                                node.collaborators.map(async (userId) => {
-                                    try {
-                                        return await getUserProfileById(userId);
-                                    } catch (err) {
-                                        console.error(`Failed to fetch profile for user ${userId}:`, err);
-                                        // Return a default profile on error
-                                        return { display_name: `User ${userId}`, profile_pic: null };
-                                    }
-                                })
-                            );
-                            
-                            return { ...node, collaboratorProfiles };
-                        } catch (err) {
-                            console.error(`Error fetching collaborator profiles for node ${node.id}:`, err);
-                            // Return node with empty collaborator profiles if fetch fails
-                            return { ...node, collaboratorProfiles: [] };
-                        }
-                    })
-                );
-                
-                setNodes(enhancedNodes);
-                console.log('Enhanced nodes with collaborators:', enhancedNodes);
-            } catch (err: any) {
-                console.error('Failed to fetch root nodes:', err);
-                setNodesError(err.message || 'Failed to load root nodes');
-            } finally {
-                setNodesLoading(false);
-            }
-        };
-
         fetchRootNodesWithCollaborators();
-    }, []);
+    }, [location.state]);
+
+    // useEffect(() => {
+    //     fetchUserProfile();
+    //     fetchRootNodesWithCollaborators();
+    // }, []);
 
     // Handle status button click
     const handleStatusChange = (newStatus: Status) => {
@@ -126,7 +124,7 @@ const Home: React.FC = () => {
     };
 
     // Filter nodes based on selected status
-    const filteredNodes = status === 'all' 
+    const filteredNodes : NodeData[] = status === 'all'
         ? nodes 
         : nodes.filter(node => node.status === status);
 
@@ -218,116 +216,16 @@ const Home: React.FC = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredNodes.map(node => (
-                            <div 
-                                key={node.id} 
-                                className={`p-4 rounded-lg border border-black`}
-                                onClick={() => navigate(`/main/${node.id}`)}
-                            >
-                                <div className="flex items-center mb-2">
-                                    <h1 className="text-xl flex-grow">{node.title}</h1>
-                                    <div className="flex -space-x-2 overflow-hidden">
-                                        {/* Show up to 4 collaborators, excluding current user */}
-                                        {node.collaboratorProfiles && node.collaboratorProfiles.length > 0 && 
-                                            node.collaboratorProfiles
-                                                .filter(collab => profile && collab.display_name !== profile.display_name)
-                                                .slice(0, 4)
-                                                .map((collab, index) => (
-                                                    <div 
-                                                        key={index} 
-                                                        className="w-6 h-6 rounded-full border border-white overflow-hidden bg-gray-300"
-                                                        title={collab.display_name}
-                                                    >
-                                                        {collab.profile_pic ? (
-                                                            <img 
-                                                                src={collab.profile_pic} 
-                                                                alt={collab.display_name} 
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full bg-gray-300" />
-                                                        )}
-                                                    </div>
-                                                ))
-                                        }
-                                        
-                                        {/* Always show current user's avatar as last (5th) item */}
-                                        {profile && (
-                                            <div 
-                                                className="w-6 h-6 rounded-full border-2 border-blue-400 overflow-hidden bg-gray-300"
-                                                title={`You (${profile.display_name || profile.username})`}
-                                            >
-                                                {profile.profile_pic ? (
-                                                    <img 
-                                                        src={profile.profile_pic} 
-                                                        alt={profile.display_name || profile.username} 
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gray-300" />
-                                                )}
-                                            </div>
-                                        )}
-                                        
-                                        {/* Show "+X more" indicator if there are more than 4 additional collaborators (excluding self) */}
-                                        {node.collaboratorProfiles && 
-                                         profile && 
-                                         node.collaboratorProfiles.filter(collab => collab.display_name !== profile.display_name).length > 4 && (
-                                            <div className="w-6 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-xs text-gray-600">
-                                                +{node.collaboratorProfiles.filter(collab => collab.display_name !== profile.display_name).length - 4}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                
-                                {/* Existing deadline display */}
-                                {node.deadline && (
-                                    <p className={`text-sm mt-1 ${node.status === 'completed' ? 'text-gray-600' : 'text-red-500 font-medium'}`}>
-                                        {new Date(node.deadline).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </p>
-                                )}
-
-                                {node.children.length > 0 && (
-                                    <div className="mt-2">
-                                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                                            <div className="flex-grow bg-gray-400 rounded-full h-2.5 mr-2">
-                                                <div 
-                                                    className={`h-2.5 rounded-full border border-black ${
-                                                        node.status === 'completed' 
-                                                            ? 'bg-custom-blue' 
-                                                            : node.status === 'ongoing' 
-                                                                ? 'bg-custom-yellow' 
-                                                                : 'bg-custom-lightred'
-                                                    }`}
-                                                    style={{ 
-                                                        width: `${node.children.length > 0 
-                                                            ? (node.completed_subtasks / node.children.length) * 100 
-                                                            : 0}%` 
-                                                    }}
-                                                ></div>
-                                            </div>
-                                            <span className="flex-shrink-0 whitespace-nowrap">
-                                                {node.completed_subtasks} / {node.children.length}
-                                            </span>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="flex justify-between mt-3">
-                                    <span className="text-xs text-gray-500">
-                                        Priority: {node.priority}
-                                    </span>
-                                    <span className="text-xs capitalize">
-                                        {node.status}
-                                    </span>
-                                </div>
-                            
-                            </div>
-                        ))}
+                        {
+                            filteredNodes.map(node => {
+                                node['icon_id'] = 1;
+                                return <NodeCard
+                                    node_data={node}
+                                    key={node.id}
+                                    isHomePage={true}
+                                />
+                        }
+                        )}
                     </div>
                 )}
             </div>
