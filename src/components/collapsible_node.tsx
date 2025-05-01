@@ -17,6 +17,7 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }
         // Filter out null responses (nodes the user can't access)
         const validChildren = fetchedChildrenResults.filter(child => child !== null);
         
+        // Make sure icon is preserved in the data
         setChildren(validChildren);
       } catch (error) {
         console.error("Error loading children:", error);
@@ -33,14 +34,19 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }
             loadChildren={loadChildren}
         />
 
-        {isCollapsed && children && children.length > 0 && (
+          {isCollapsed && children && children.length > 0 && (
             <div className="pl-10 ml-4 relative">
-              {children.map((child) => (
-                  child['icon_id'] = 1,
+              {children.map((child) => {
+                // Only set icon_id if icon is not available as fallback
+                if (!child.icon) {
+                  child['icon_id'] = 1;
+                }
+                return (
                   <div key={child.id} className={`relative`}>
                     <CollapsibleNode node_data={child} />
                   </div>
-              ))}
+                );
+              })}
             </div>
         )}
       </div>

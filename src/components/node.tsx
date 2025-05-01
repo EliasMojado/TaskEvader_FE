@@ -25,7 +25,8 @@ export type NodeData = {
   completed_subtasks: number;
   ongoing_subtasks: number;
   missed_subtasks: number;
-  icon_id: number;
+  icon_id?: number;
+  icon?: string;
   children: NodeData[];
 }
 
@@ -54,7 +55,7 @@ const IconsMap: Icons = {
 export const Node: React.FC<{
   isCollapsed?: boolean,
   node_data: NodeData,
-  setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>
+  setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>,
   isHomePage?: boolean,
   loadChildren?: () => Promise<void>
 }> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren}) => {
@@ -137,7 +138,25 @@ export const Node: React.FC<{
             }
 
             <div className={'flex flex-col items-center justify-center'}>
-              {node_data.parent == null ? IconsMap[node_data.icon_id].icon_lg : isLeaf ? IconsMap[node_data.icon_id].icon_sm : IconsMap[node_data.icon_id].icon_md}
+              {node_data.icon ? (
+                // If icon is available, render the emoji with appropriate size
+                <span className={
+                  node_data.parent == null 
+                    ? 'text-5xl' // Large size for root nodes
+                    : isLeaf 
+                      ? 'text-xl' // Small size for leaf nodes
+                      : 'text-3xl' // Medium size for others
+                }>
+                  {node_data.icon}
+                </span>
+              ) : (
+                // Fallback to original icons if no emoji is available
+                node_data.parent == null 
+                  ? IconsMap[node_data.icon_id || 1].icon_lg 
+                  : isLeaf 
+                    ? IconsMap[node_data.icon_id || 1].icon_sm 
+                    : IconsMap[node_data.icon_id || 1].icon_md
+              )}
             </div>
 
             {
