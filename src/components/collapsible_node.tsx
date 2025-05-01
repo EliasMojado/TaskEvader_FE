@@ -9,10 +9,15 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }
   const loadChildren = async () => {
     if (node_data.children && node_data.children.length > 0) {
       try {
-        const fetchedChildren = await Promise.all(
-            node_data.children.map((id: number) => fetchSpecificNodeWithCollaborator(id))
+        // Fetch all children and filter out null results (nodes user can't access)
+        const fetchedChildrenResults = await Promise.all(
+          node_data.children.map((id: number) => fetchSpecificNodeWithCollaborator(id))
         );
-        setChildren(fetchedChildren);
+        
+        // Filter out null responses (nodes the user can't access)
+        const validChildren = fetchedChildrenResults.filter(child => child !== null);
+        
+        setChildren(validChildren);
       } catch (error) {
         console.error("Error loading children:", error);
       }
