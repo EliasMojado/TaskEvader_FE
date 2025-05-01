@@ -293,6 +293,14 @@
   padding: 20px;
 }
 
+.emoji-selector .EmojiPickerReact .epr-btn-clear-search {
+  display: none;
+}
+
+.emoji-selector .EmojiPickerReact .epr-icn-search {
+  display: none;
+}
+
 .emoji-selector .EmojiPickerReact .epr-category-nav {
   display: none;
 }

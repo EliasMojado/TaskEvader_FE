@@ -114,7 +114,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
             <EmojiPicker 
               onEmojiClick={handleEmojiClick}
               skinTonesDisabled={true}
-              searchPlaceHolder=""
+              searchPlaceHolder="Search"
               lazyLoadEmojis={true}
               searchDisabled={false}
               width={350}
