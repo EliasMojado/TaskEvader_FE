@@ -221,7 +221,9 @@ const Home: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {
                             filteredNodes.map(node => {
-                                node['icon_id'] = 1;
+                                if (!node.icon) {
+                                    node['icon_id'] = 1;
+                                }
                                 return <NodeCard
                                     node_data={node}
                                     key={node.id}

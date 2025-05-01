@@ -16,6 +16,7 @@ export interface Node {
   missed_subtasks: number;
   created_at: string;
   updated_at: string;
+  icon?: string;
 }
 
 export interface CreateNodePayload {
