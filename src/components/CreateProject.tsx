@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Task, User } from "../data/types"; 
 import "../styles/SlidingForm.css";
 import plus from "../../public/plus.png";
 import { searchUsers } from "../services/profile";
 import { createNode } from "../services/nodes";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
 interface CreateProjectProps {
   onClose: () => void;
@@ -20,6 +21,26 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [selectedEmoji, setSelectedEmoji] = useState<string>("📋"); // Default emoji
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close emoji picker
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    }
+    
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
 
   // Search user logic
   useEffect(() => {
@@ -50,22 +71,17 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
   
     // Ensure all assigned users have valid ids
     const validAssignedUsers = assignedUsers.filter(user => user.id != null);
-    // console.log("Valid assigned users:", validAssignedUsers);
-    // if (validAssignedUsers.length === 0) {
-    //   alert("Please assign at least one valid user.");
-    //   return;
-    // }
   
     const payload = {
       title: taskTitle,
       description,
       deadline: dueDate || null,
       priority: priority === "High" ? 3 : priority === "Medium" ? 2 : 1,
-      // Adjust the status to match Django's expected case
-      status: status === "ongoing" ? "ongoing" : status === "done" ? "done" : "missed",
+      status: status === "ongoing" ? "ongoing" : status === "done" ? "completed" : "missed",
       parent: parentId ?? null,
       collaborators: validAssignedUsers.map((user) => user.id),
       completed_subtasks: 0,
+      icon: selectedEmoji, // Add the selected emoji to the payload
     };
   
     try {
@@ -78,8 +94,6 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
     }
   };
   
-  
-
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -92,9 +106,47 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
     console.log("Assigned users:", assignedUsers);
   };
 
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setSelectedEmoji(emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
+
   return (
     <div className="sliding-form">
       <h2>{parentId ? "Create Subtask" : "Create Root Task"}</h2>
+
+      {/* Emoji Selector */}
+      <div className="emoji-selector mb-4">
+        <div className="flex items-center gap-2">
+          <button 
+            className="text-4xl p-2 border rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            {selectedEmoji}
+          </button>
+          <span className="text-sm text-gray-500">Click to change icon</span>
+        </div>
+        
+        {showEmojiPicker && (
+          <div 
+            ref={emojiPickerRef}
+            className="absolute z-10 mt-2 shadow-lg border rounded-lg"
+          >
+            <EmojiPicker 
+              onEmojiClick={handleEmojiClick}
+              skinTonesDisabled={true}
+              searchPlaceHolder="Search"
+              lazyLoadEmojis={true}
+              searchDisabled={false}
+              width={350}
+              height={350}
+              previewConfig={{
+                showPreview: false
+              }}
+            />
+          </div>
+        )}
+      </div>
 
       <input
         type="text"
@@ -145,7 +197,6 @@ const CreateProject: React.FC<CreateProjectProps> = ({ onClose, parentId }) => {
           </select>
         </div>
       )}
-
 
       <div className="assigned-users">
         <h3>Assigned Users</h3>

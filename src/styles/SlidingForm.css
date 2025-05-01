@@ -279,3 +279,31 @@
 .priority-selector select option[value="High"] {
   background-color: #f8d7da;
 }
+
+.emoji-selector .EmojiPickerReact .epr-search-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: -5vh;
+  padding: 8px;
+  position: relative;
+}
+
+.emoji-selector .EmojiPickerReact .epr-search-container input {
+  display: flex;
+  padding: 20px;
+}
+
+.emoji-selector .EmojiPickerReact .epr-btn-clear-search {
+  display: none;
+}
+
+.emoji-selector .EmojiPickerReact .epr-icn-search {
+  display: none;
+}
+
+.emoji-selector .EmojiPickerReact .epr-category-nav {
+  display: none;
+}
+
+
+
