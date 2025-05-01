@@ -159,16 +159,22 @@ export const fetchSpecificNodeWithCollaborator = async (id: number) => {
           } catch (err) {
             console.error(`Failed to fetch profile for user ${userId}:`, err);
             // Return a default profile on error
-            return { display_name: `User ${userId}`, profile_pic: null };
+            return { display_name: `User ${userId}`, profile_pic: null, id: userId };
           }
         })
     );
 
-      return { ...node, collaboratorProfiles };
-    } catch (err) {
-      console.error(`Error fetching collaborator profiles for node ${node.id}:`, err);
-      // Return node with empty collaborator profiles if fetch fails
-      return { ...node, collaboratorProfiles: [] };
+    return { ...node, collaboratorProfiles };
+  } catch (err: any) {
+    // Check if this is a 404 error (node not found / no access)
+    if (err.message && (err.message.includes('404') || err.message.includes('No Node matches'))) {
+      console.log(`User does not have access to node ${id}, skipping`);
+      return null; // Return null to indicate this node should be skipped
     }
+    
+    console.error(`Error fetching collaborator profiles for node ${id}:`, err);
+    // Return node with empty collaborator profiles for other errors
+    return { id, collaboratorProfiles: [], children: [] };
+  }
 };
 
