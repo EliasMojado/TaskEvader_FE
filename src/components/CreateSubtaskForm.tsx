@@ -72,6 +72,10 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
       alert("Please enter a task title.");
       return;
     }
+    if (!dueDate) {
+      alert("Please select a due date.");
+      return;
+    }
 
     const validAssignedUsers = assignedUsers.filter(user => user.id != null);
 
@@ -168,6 +172,8 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
         type="datetime-local"
         value={dueDate}
         onChange={(e) => setDueDate(e.target.value)}
+        min={new Date().toISOString().slice(0, 16)} // YYYY-MM-DDTHH:MM
+        required
       />
 
       <div className="priority-selector">
