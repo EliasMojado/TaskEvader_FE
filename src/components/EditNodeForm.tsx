@@ -17,9 +17,10 @@ interface EditNodeFormProps {
   onClose: () => void;
   onUpdate: () => void; // Optional callback to refresh node data
   initialCollaborators: number[]; // Initial collaborators IDs
+  onRefresh?: () => void; // Optional callback to refresh node data
 }
 
-const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, initialCollaborators}) => {
+const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, initialCollaborators, onRefresh}) => {
   const [taskTitle, setTaskTitle] = useState(node.title);
   const [description, setDescription] = useState(node.description || "");
   const [dueDate, setDueDate] = useState<string>(node.deadline || "");
@@ -120,6 +121,7 @@ const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, in
       await updateNode(payload.id, payload);
       onUpdate?.();
       onClose();
+      onRefresh?.(); // Call the refresh function if provided
     } catch (err: any) {
       console.error("Failed to update node:", err);
       alert("Error: " + (err.message ?? "Unknown error"));

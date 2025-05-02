@@ -16,6 +16,7 @@ import {IoIosCheckboxOutline, IoMdTrash} from "react-icons/io";
 import {AiFillFileAdd, AiOutlineCloseSquare} from "react-icons/ai";
 import CreateSubtaskForm from "./CreateSubtaskForm.tsx";
 import EditNodeForm from './EditNodeForm.tsx';
+import { deleteNode } from "../services/nodes";
 
 export type NodeData = {
   id: number;
@@ -60,15 +61,31 @@ export const Node: React.FC<{
   node_data: NodeData,
   setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>,
   isHomePage?: boolean,
-  loadChildren?: () => Promise<void>
-}> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren}) => {
+  loadChildren?: () => Promise<void>,
+  onRefresh?: () => void
+}> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren, onRefresh}) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showEditProject, setShowEditProject] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const navigate = useNavigate();
   const key = node_data.id;
   const isLeaf = !(node_data.completed_subtasks || node_data.ongoing_subtasks || node_data.missed_subtasks);
+
+  const handleDelete = async () => {
+    // Example: call your backend API to delete the node
+    try {
+      await deleteNode(node_data.id);
+      console.log(`Deleting node with ID ${node_data.id}`);
+      setShowDeleteConfirm(false);
+      onRefresh?.(); // Call the onRefresh function to refresh the parent node
+      // optionally reload or update UI
+    } catch (error) {
+      console.error("Failed to delete node:", error);
+    }
+  };
+  
 
   const handleToggleCollapse = () => {
     if (setIsCollapsed && !isLeaf) {
@@ -302,9 +319,12 @@ export const Node: React.FC<{
                       <BiEdit size={15} color={'#197278'}/>
                       <span className={'text-palm-blue font-inter font-medium text-sm'}>Edit</span>
                   </div>
-                  <div className={'flex flex-row items-center gap-2'}>
-                      <IoMdTrash size={15} color={'#FC7554'}/>
-                      <span className={'text-palm-blue font-inter font-medium text-sm'}>Delete</span>
+                  <div
+                    className={'flex flex-row items-center gap-2 cursor-pointer'}
+                    onClick={() => setShowDeleteConfirm(true)}
+                  >
+                    <IoMdTrash size={15} color={'#FC7554'} />
+                    <span className={'text-palm-blue font-inter font-medium text-sm'}>Delete</span>
                   </div>
               </div>
           }
@@ -322,6 +342,7 @@ export const Node: React.FC<{
             <CreateSubtaskForm
                 parentNode={node_data}
                 onClose={() => setShowCreateProject(false)}
+                onRefresh={onRefresh}
             />
         </div>
 
@@ -347,6 +368,7 @@ export const Node: React.FC<{
         >
             <EditNodeForm
                 node={node_data}
+                onRefresh={onRefresh}
                 onClose={() => setShowCreateProject(false)}
                 onUpdate={() => {
                   setShowEditProject(false);
@@ -365,6 +387,30 @@ export const Node: React.FC<{
                 }}
             />
         )}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+              onClick={() => setShowDeleteConfirm(false)}>
+            <div className="bg-white p-6 rounded-lg shadow-md" onClick={e => e.stopPropagation()}>
+              <h2 className="text-lg font-bold mb-4 text-palm-blue">Are you sure?</h2>
+              <p className="mb-4">Do you really want to delete <strong>{node_data.title}</strong>?</p>
+              <div className="flex justify-end gap-4">
+                <button
+                  className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
   );
 };
