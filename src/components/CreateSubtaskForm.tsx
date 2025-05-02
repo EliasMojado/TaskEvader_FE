@@ -15,9 +15,10 @@ interface User {
 interface CreateSubtaskFormProps {
   parentNode: NodeData;
   onClose: () => void;
+  onRefresh?: () => void;
 }
 
-const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClose }) => {
+const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClose, onRefresh }) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<string>("");
@@ -95,6 +96,7 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
       const created = await createNode(payload);
       console.log("Successfully created node:", created);
       onClose();
+      onRefresh?.();
     } catch (err: any) {
       console.error("Failed to create node:", err);
       alert("Error: " + (err.message ?? "Unknown error"));

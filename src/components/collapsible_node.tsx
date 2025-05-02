@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { Node, NodeData } from "./node.tsx";
 
-export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }) => {
+export const CollapsibleNode: React.FC<{ node_data: NodeData; onRefresh?: () => void }> = ({ node_data, onRefresh }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   // Log the node data structure for debugging
@@ -23,6 +23,7 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }
           setIsCollapsed={setIsCollapsed}
           node_data={node_data}
           loadChildren={loadChildren}
+          onRefresh={onRefresh}
       />
 
       {isCollapsed && node_data.children && node_data.children.length > 0 && (
@@ -36,7 +37,7 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData }> = ({ node_data }
             }
             return (
               <div key={childData.id} className="relative">
-                <CollapsibleNode node_data={childData} />
+                <CollapsibleNode node_data={childData} onRefresh={onRefresh} />
               </div>
             );
           })}

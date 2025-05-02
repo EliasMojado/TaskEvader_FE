@@ -61,8 +61,9 @@ export const Node: React.FC<{
   node_data: NodeData,
   setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>,
   isHomePage?: boolean,
-  loadChildren?: () => Promise<void>
-}> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren}) => {
+  loadChildren?: () => Promise<void>,
+  onRefresh?: () => void
+}> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren, onRefresh}) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -78,6 +79,7 @@ export const Node: React.FC<{
       await deleteNode(node_data.id);
       console.log(`Deleting node with ID ${node_data.id}`);
       setShowDeleteConfirm(false);
+      onRefresh?.(); // Call the onRefresh function to refresh the parent node
       // optionally reload or update UI
     } catch (error) {
       console.error("Failed to delete node:", error);
@@ -340,6 +342,7 @@ export const Node: React.FC<{
             <CreateSubtaskForm
                 parentNode={node_data}
                 onClose={() => setShowCreateProject(false)}
+                onRefresh={onRefresh}
             />
         </div>
 
@@ -365,6 +368,7 @@ export const Node: React.FC<{
         >
             <EditNodeForm
                 node={node_data}
+                onRefresh={onRefresh}
                 onClose={() => setShowCreateProject(false)}
                 onUpdate={() => {
                   setShowEditProject(false);

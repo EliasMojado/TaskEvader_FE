@@ -28,51 +28,58 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
 
     // Fetch root node data
     useEffect(() => {
-        const fetchRootNode = async () => {
-            if (!id) return;
-            
-            // logDebug(`Fetching root node with ID: ${id}`);
-            try {
-                const data = await fetchSpecificNodeWithCollaborator(parseInt(id));
-                if (!data) {
-                    throw new Error(`Node with ID ${id} not found or not accessible`);
-                }
-                
-                // logDebug('Root node data received', {
-                //     id: data.id,
-                //     title: data.title,
-                //     childrenIds: data.children
-                // });
-                
-                data['icon_id'] = 1;
-                setRootNode(data);
-                
-                // Check if children are already full objects (not just IDs)
-                const childrenAreObjects = Array.isArray(data.children) && 
-                    data.children.length > 0 && 
-                    typeof data.children[0] === 'object';
-                
-                if (childrenAreObjects) {
-                    // Children are already objects, no need to fetch
-                    // logDebug('Children are already objects, no need to fetch', data.children);
-                    setIsLoading(false);
-                } else if (Array.isArray(data.children) && data.children.length > 0) {
-                    // Children are IDs, need to fetch
-                    // logDebug('Children are IDs, need to fetch', data.children);
-                    initialFetchCompleteRef.current = false;
-                    fetchChildNodesData(data.children, true);
-                } else {
-                    // No children to fetch, so we can stop loading
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                console.error("Error fetching root node:", error);
-                setIsLoading(false);
-            }
-        };
-        
         fetchRootNode();
     }, [id]);
+
+    const refreshNodeTree = async () => {
+        setIsLoading(true); // Optional, show loader again
+        setChildNodes({});
+        await fetchRootNode(); // Re-fetch everything
+    };    
+
+    const fetchRootNode = async () => {
+        if (!id) return;
+        
+        // logDebug(`Fetching root node with ID: ${id}`);
+        try {
+            const data = await fetchSpecificNodeWithCollaborator(parseInt(id));
+            if (!data) {
+                throw new Error(`Node with ID ${id} not found or not accessible`);
+            }
+            
+            // logDebug('Root node data received', {
+            //     id: data.id,
+            //     title: data.title,
+            //     childrenIds: data.children
+            // });
+            
+            data['icon_id'] = 1;
+            setRootNode(data);
+            
+            // Check if children are already full objects (not just IDs)
+            const childrenAreObjects = Array.isArray(data.children) && 
+                data.children.length > 0 && 
+                typeof data.children[0] === 'object';
+            
+            if (childrenAreObjects) {
+                // Children are already objects, no need to fetch
+                // logDebug('Children are already objects, no need to fetch', data.children);
+                setIsLoading(false);
+            } else if (Array.isArray(data.children) && data.children.length > 0) {
+                // Children are IDs, need to fetch
+                // logDebug('Children are IDs, need to fetch', data.children);
+                initialFetchCompleteRef.current = false;
+                fetchChildNodesData(data.children, true);
+            } else {
+                // No children to fetch, so we can stop loading
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error("Error fetching root node:", error);
+            setIsLoading(false);
+        }
+    };
+
     
     // Fetch child nodes data based on IDs
     const fetchChildNodesData = async (childrenIds: number[], isInitialFetch = false) => {
@@ -353,7 +360,7 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
             </div>
             
             <div className={'flex flex-col items-center justify-center w-fit gap-5'}>
-                {processedNodeData && <CollapsibleNode node_data={processedNodeData} />}
+                {processedNodeData && <CollapsibleNode node_data={processedNodeData} onRefresh={refreshNodeTree}/>}
             </div>
         </main>
     );
