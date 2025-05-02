@@ -118,7 +118,6 @@ const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, in
 
     try {
       await updateNode(payload.id, payload);
-      alert("Node updated successfully!");
       onUpdate?.();
       onClose();
     } catch (err: any) {
@@ -213,6 +212,21 @@ const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, in
           <option value="High">High</option>
         </select>
       </div>
+
+      <div className="status-selector mt-4">
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+        <select
+          id="status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value as "ongoing" | "missed" | "done")}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="ongoing">Ongoing</option>
+          <option value="missed">Missed</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+
 
       <div className="assigned-users">
         <h3>Assigned Users</h3>
