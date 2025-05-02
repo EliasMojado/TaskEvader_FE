@@ -8,6 +8,7 @@ export const ProgressBar = ({progress}: ProgressProps) => {
     const total_subtasks: number = progress.completed + progress.ongoing + progress.missed;
     return <div className="h-full">
         <div className="flex flex-row h-full w-full max-w-md rounded-full overflow-hidden border border-black">
+            {progress.completed > 0 &&
             <div
                 data-tooltip-id={'finished_tooltip'}
                 data-tooltip-content={`${progress.completed}/${total_subtasks} Finished`}
@@ -15,15 +16,16 @@ export const ProgressBar = ({progress}: ProgressProps) => {
                 data-tooltip-delay-hide={200}
                 data-tooltip-place={"bottom"}
                 data-tooltip-class-name="text-red"
-                className="bg-carribean-current h-full cursor-pointer hover:shadow-lg"
+                className="bg-uranian-blue h-full cursor-pointer hover:shadow-lg border-r border-black"
                 style={{
                     width: `${(progress.completed / total_subtasks) * 100}%`
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
                 }}
-            />
+            />}
 
+            {progress.ongoing > 0 &&
             <div
                 data-tooltip-id={'ongoing_tooltip'}
                 data-tooltip-content={`${progress.ongoing}/${total_subtasks} In Progress`}
@@ -38,8 +40,9 @@ export const ProgressBar = ({progress}: ProgressProps) => {
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
-            />
+            />}
 
+            {progress.missed > 0 &&
             <div
                 data-tooltip-id={'missed_tooltip'}
                 data-tooltip-content={`${progress.missed}/${total_subtasks} Missed`}
@@ -54,7 +57,7 @@ export const ProgressBar = ({progress}: ProgressProps) => {
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
-            />
+            />}
         </div>
         <Tooltip
             id="finished_tooltip"
@@ -71,15 +74,17 @@ export const ProgressBar = ({progress}: ProgressProps) => {
         />
         <Tooltip
             id="ongoing_tooltip"
+            opacity={0.8}
             style={{
-                backgroundColor: "#197278",
-                color: "#F9F94D",
-                padding: "8px 12px",
+                backgroundColor: "#FDFF83",
+                color: "#001F54",
+                padding: "8px 10px",
                 borderRadius: "6px",
-                fontWeight: "bold",
                 boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                fontSize: "12px",
-                zIndex: 10
+                fontSize: "10px",
+                zIndex: 10,
+
+                backdropFilter: "blur(30px)",
             }}
         />
         <Tooltip
