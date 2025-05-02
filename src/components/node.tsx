@@ -192,7 +192,7 @@ export const Node: React.FC<{
                       node_data.parent == null 
                         ? isHomePage 
                           ? 'font-bold text-l leading-none ' 
-                          : 'font-extrabold text-3xl' 
+                          : 'font-medium text-3xl' 
                         : 'font-medium text-sm'
                       } text-palm-blue ${
                         node_data.status === STATUS.completed ? 'line-through' : ''

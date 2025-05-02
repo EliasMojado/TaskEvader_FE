@@ -14,7 +14,7 @@ export default {
         'carribean-current': "#197278",
         'uranian-blue': "#B4D3F9",
         'whitish': "#FEFEFF",
-        'icterine': "#F9F94D",
+        'icterine': "#FDFF83",
         'pastel-red': "#FC7554",
       },
       fontFamily: {
