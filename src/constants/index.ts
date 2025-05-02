@@ -7,7 +7,7 @@ export const ROUTES = {
 }
 
 export const STATUS = {
-  completed: 'completed',
+  completed: 'done',
   ongoing: 'ongoing',
   missed: 'missed',
 }

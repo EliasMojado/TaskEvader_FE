@@ -91,8 +91,8 @@ export const Node: React.FC<{
             setHovered(false);
             setShowOptions(false);
           }}
-          className={`flex flex-row w-full items-center gap-2 relative border cursor-pointer hover:shadow-lg transition-all duration-200
-                    ${node_data.parent == null ? 'rounded-3xl px-6 py-4 border-palm-blue' : 'rounded-lg px-6 py-2 border-carribean-current'}`}
+          className={`flex mb-2 flex-row w-full items-center gap-2 relative border cursor-pointer hover:shadow-lg transition-all duration-200
+                    ${node_data.parent == null ? 'rounded-lg px-6 py-4 border-palm-blue mt-5' : 'rounded-lg px-6 py-2 border-carribean-current'}`}
       >
         {
           /*
@@ -188,7 +188,15 @@ export const Node: React.FC<{
                   */
                 }
                 <h1
-                    className={`w-fit font-inter ${node_data.parent == null ? isHomePage ? 'font-bold text-l leading-none ' : 'font-extrabold text-3xl' : 'font-medium text-sm'} text-palm-blue`}
+                    className={`w-fit font-inter ${
+                      node_data.parent == null 
+                        ? isHomePage 
+                          ? 'font-bold text-l leading-none ' 
+                          : 'font-extrabold text-3xl' 
+                        : 'font-medium text-sm'
+                      } text-palm-blue ${
+                        node_data.status === STATUS.completed ? 'line-through' : ''
+                      }`}
                     style={isHomePage ? {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -228,7 +236,7 @@ export const Node: React.FC<{
                   - Progress Bar
                 */
               }
-              {!node_data.parent == null && !isLeaf &&
+              {node_data.parent == null || !isLeaf &&
                   <div className={'h-2'}>
                       <ProgressBar progress={
                         {
