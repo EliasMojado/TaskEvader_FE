@@ -219,7 +219,7 @@ export const Node: React.FC<{
                     <TbCalendarClock/>
                     <span>
                       {/* {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString()} */}
-                      {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US', {timeZone: 'UTC', timeZoneName: 'short'})}
+                      {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US', {timeZoneName: 'short'})}
                     </span>
                   </span>
                   <span className={'flex flex-row'}>
@@ -285,7 +285,8 @@ export const Node: React.FC<{
                   setHovered(false)
                 }}/>
           {showOptions &&
-              <div className={'absolute left-1 flex flex-col gap-2 bg-white rounded-xl border shadow-lg p-4'}>
+              <div className={'absolute left-1 flex flex-col gap-2 bg-white rounded-xl border shadow-lg p-4'} 
+                  onClick={(e) => e.stopPropagation()}>
                   <h1 className={'text-palm-blue font-inter font-bold text-sm'}>Actions</h1>
 
                   <div className={'flex flex-row items-center gap-2 cursor-pointer'}
@@ -316,6 +317,7 @@ export const Node: React.FC<{
                 ${showCreateProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
                 ${showCreateProject ? 'pointer-events-auto' : 'pointer-events-none'}
             `}
+            onClick={(e) => e.stopPropagation()}
         >
             <CreateSubtaskForm
                 parentNode={node_data}
@@ -328,7 +330,10 @@ export const Node: React.FC<{
         {showCreateProject && (
             <div 
                 className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                onClick={() => setShowCreateProject(false)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCreateProject(false);
+                }}
             />
         )}
         <div 
@@ -338,6 +343,7 @@ export const Node: React.FC<{
                 ${showEditProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
                 ${showEditProject ? 'pointer-events-auto' : 'pointer-events-none'}
             `}
+            onClick={(e) => e.stopPropagation()}
         >
             <EditNodeForm
                 node={node_data}
@@ -353,7 +359,10 @@ export const Node: React.FC<{
         {showEditProject && (
             <div 
                 className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                onClick={() => setShowEditProject(false)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setShowEditProject(false);
+                }}
             />
         )}
       </main>
