@@ -101,13 +101,15 @@ const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, in
       return;
     }
 
+    const utcDueDate = new Date(dueDate).toISOString();
+
     const validAssignedUsers = assignedUsers.filter((user) => user.id != null);
 
     const payload = {
       id: node.id,
       title: taskTitle,
       description,
-      deadline: dueDate || null,
+      deadline: utcDueDate || null,
       priority: priority === "High" ? 3 : priority === "Medium" ? 2 : 1,
       status,
       collaborators: validAssignedUsers.map((user) => user.id),
@@ -141,8 +143,15 @@ const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, in
     setShowEmojiPicker(false);
   };
 
+  const formatLocalDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const offset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
   return (
-    <div className="sliding-form">
+    <div className="sliding-form cursor-default">
       <h2>Edit Task</h2>
 
       {/* Emoji Selector */}
@@ -187,7 +196,7 @@ const EditNodeForm: React.FC<EditNodeFormProps> = ({ node, onClose, onUpdate, in
 
       <input
         type="datetime-local"
-        value={dueDate ? new Date(dueDate).toISOString().slice(0, 16) : ""}
+        value={dueDate ? formatLocalDateTime(dueDate) : ""}
         onChange={(e) => setDueDate(e.target.value)}
         min={new Date().toISOString().slice(0, 16)}
       />

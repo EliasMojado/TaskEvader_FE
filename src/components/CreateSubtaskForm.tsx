@@ -118,7 +118,7 @@ const CreateSubtaskForm: React.FC<CreateSubtaskFormProps> = ({ parentNode, onClo
   };
 
   return (
-    <div className="sliding-form">
+    <div className="sliding-form cursor-default">
       <h2>Create Subtask</h2>
 
       {/* Emoji Selector */}
