@@ -14,6 +14,7 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [sortOption, setSortOption] = useState<SortOption>('deadline');
     const [filterOption, setFilterOption] = useState<FilterOption>('all');
+    
     // const debugRef = useRef({ renderCount: 0 });
     
     // Keep track of the initial child fetch

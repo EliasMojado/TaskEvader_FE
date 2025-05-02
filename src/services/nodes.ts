@@ -122,7 +122,7 @@ export const createNode = async (payload: CreateNodePayload): Promise<Node> => {
   }
 };
 
-export const deleteNodeWithChildren = async (id: number | string): Promise<void> => {
+export const deleteNode = async (id: number | string): Promise<void> => {
   const token = localStorage.getItem('authToken');
 
   if (!token) {
@@ -130,7 +130,7 @@ export const deleteNodeWithChildren = async (id: number | string): Promise<void>
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/cascade-delete/`, {
+    const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Token ${token}`,
