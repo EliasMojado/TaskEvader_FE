@@ -1,12 +1,14 @@
 import { API_BASE_URL } from '../constants';
 
 export interface UserProfile {
+  id: number;
   username: string;
   display_name?: string;
   profile_pic?: string;
 }
 
 export interface CollaboratorProfile {
+    id: number;
     display_name: string;
     profile_pic: string | null;
 }  
