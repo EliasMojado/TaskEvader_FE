@@ -1,4 +1,4 @@
-import React, {JSX, useState} from 'react';
+import React, {JSX, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {STATUS} from "../constants/index.ts";
 import {
@@ -15,11 +15,13 @@ import {BiDotsVertical, BiEdit} from "react-icons/bi";
 import {IoIosCheckboxOutline, IoMdTrash} from "react-icons/io";
 import {AiFillFileAdd, AiOutlineCloseSquare} from "react-icons/ai";
 import CreateSubtaskForm from "./CreateSubtaskForm.tsx";
+import EditNodeForm from './EditNodeForm.tsx';
 
 export type NodeData = {
   id: number;
   title: string;
   deadline: string;
+  description: string;
   collaborators: CollaboratorProfile[];
   parent: number;
   status: string;
@@ -63,10 +65,10 @@ export const Node: React.FC<{
   const [hovered, setHovered] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showEditProject, setShowEditProject] = useState(false);
   const navigate = useNavigate();
   const key = node_data.id;
   const isLeaf = !(node_data.completed_subtasks || node_data.ongoing_subtasks || node_data.missed_subtasks);
-  
 
   const handleToggleCollapse = () => {
     if (setIsCollapsed && !isLeaf) {
@@ -291,7 +293,11 @@ export const Node: React.FC<{
                       <AiFillFileAdd size={15} color={'#197278'}/>
                       <span className={'text-palm-blue font-inter font-medium text-sm'}>Add</span>
                   </div>
-                  <div className={'flex flex-row items-center gap-2'}>
+                  <div className={'flex flex-row items-center gap-2'}
+                      onClick={() => {
+                        setShowEditProject(true);
+                        setShowOptions(false);
+                      }}>
                       <BiEdit size={15} color={'#197278'}/>
                       <span className={'text-palm-blue font-inter font-medium text-sm'}>Edit</span>
                   </div>
@@ -304,27 +310,52 @@ export const Node: React.FC<{
         </div>
         }
         <div 
-                className={`
-                    fixed top-0 right-0 h-full w-[600px] bg-white shadow-lg 
-                    transition-all duration-500 z-50
-                    ${showCreateProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
-                    ${showCreateProject ? 'pointer-events-auto' : 'pointer-events-none'}
-                `}
-            >
-                <CreateSubtaskForm
-                    parentNode={node_data}
-                    onClose={() => setShowCreateProject(false)}
-                />
-            </div>
+            className={`
+                fixed top-0 right-0 h-full w-[600px] bg-white shadow-lg 
+                transition-all duration-500 z-50
+                ${showCreateProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+                ${showCreateProject ? 'pointer-events-auto' : 'pointer-events-none'}
+            `}
+        >
+            <CreateSubtaskForm
+                parentNode={node_data}
+                onClose={() => setShowCreateProject(false)}
+            />
+        </div>
 
 
-            {/* Dim background */}
-            {showCreateProject && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                    onClick={() => setShowCreateProject(false)}
-                />
-            )}
+        {/* Dim background */}
+        {showCreateProject && (
+            <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                onClick={() => setShowCreateProject(false)}
+            />
+        )}
+        <div 
+            className={`
+                fixed top-0 right-0 h-full w-[600px] bg-white shadow-lg 
+                transition-all duration-500 z-50
+                ${showEditProject ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+                ${showEditProject ? 'pointer-events-auto' : 'pointer-events-none'}
+            `}
+        >
+            <EditNodeForm
+                node={node_data}
+                onClose={() => setShowCreateProject(false)}
+                onUpdate={() => {
+                  setShowEditProject(false);
+                  loadChildren?.();
+                }}
+                initialCollaborators={node_data.collaborators as number[]}
+            />
+        </div>
+        {/* Dim background */}
+        {showEditProject && (
+            <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                onClick={() => setShowEditProject(false)}
+            />
+        )}
       </main>
   );
 };

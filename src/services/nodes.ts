@@ -7,7 +7,7 @@ export interface Node {
   description: string;
   deadline: string | null;
   priority: number;
-  status: 'ongoing' | 'missed' | 'completed';
+  status: 'ongoing' | 'missed' | 'done';
   parent_id: number | null;
   children: Node[];
   collaborators: number[];  // Assuming these are IDs of the collaborators
@@ -179,3 +179,32 @@ export const fetchSpecificNodeWithCollaborator = async (id: number) => {
   }
 };
 
+export const updateNode = async (id: number, payload: Partial<Node>): Promise<Node> => {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to update node (Status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error(`Error updating node ${id}:`, error);
+    throw new Error(error.message || `Failed to update node ${id}`);
+  }
+}
