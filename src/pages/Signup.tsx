@@ -19,14 +19,18 @@ const SignupPage: React.FC = () => {
     e.preventDefault()
     setError(null)
     try {
-      const {} = await signup(
+      const data = await signup(
         username,
         email,
         firstName,
         lastName,
         password
       )
-      navigate('/login') 
+
+        // store token somewhere simple
+      localStorage.setItem('authToken', data.access)
+
+      navigate('/home')
     } catch (err: any) {
       setError(err.message)
     }
