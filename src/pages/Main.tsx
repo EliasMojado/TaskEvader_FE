@@ -1,8 +1,9 @@
-import {useParams} from 'react-router-dom';
+import {useParams, useNavigate} from 'react-router-dom';
 import {CollapsibleNode} from "../components/collapsible_node.tsx";
 import {useEffect, useState, useRef} from "react";
 import {fetchSpecificNodeWithCollaborator, getNodeData, Node} from "../services/nodes.ts";
-import {SyncLoader} from "react-spinners";
+import LoadingIndicator from "../components/loadingIndicator.tsx";
+import {MdArrowBackIos} from "react-icons/md";
 
 type SortOption = 'deadline' | 'priority';
 type FilterOption = 'all' | 'ongoing' | 'completed' | 'missed';
@@ -14,7 +15,8 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [sortOption, setSortOption] = useState<SortOption>('deadline');
     const [filterOption, setFilterOption] = useState<FilterOption>('all');
-    
+    const navigate = useNavigate();
+
     // const debugRef = useRef({ renderCount: 0 });
     
     // Keep track of the initial child fetch
@@ -300,21 +302,7 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
     };
 
     if(isLoading) {
-        return (
-            <div className={'flex flex-col items-center justify-center w-full h-screen gap-5 bg-gray-50'}>
-                <div className="animate-pulse">
-                    <SyncLoader
-                        color="#4f46e5"
-                        size={20}
-                        margin={5}
-                        aria-label="Loading Spinner"
-                        data-testid="loader"
-                    />
-                </div>
-                <h1 className="text-xl font-medium text-gray-700 animate-pulse">Loading Project...</h1>
-                <p className="text-sm text-gray-500">Getting your tasks ready</p>
-            </div>
-        );
+        return <LoadingIndicator/>
     }
 
     return (
@@ -337,7 +325,7 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                         <option value="priority">🔥 Priority (highest first)</option>
                     </select>
                 </div>
-                
+
                 <div className="flex items-center">
                     <label htmlFor="filter-select" className="mr-2 font-medium flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -358,6 +346,12 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                     </select>
                 </div>
             </div>
+            {/* Back to Home Button */}
+            <button
+                onClick={() => navigate('/home')}
+                className="mt-6 px-4 py-2 bg-uranian-blue text-palm-blue rounded-md shadow hover:bg-carribean-current transition flex flex-row items-center gap-2 absolute left-4 top-20">
+                <MdArrowBackIos/> <span>Home</span>
+            </button>
             
             <div className={'flex flex-col items-center justify-center w-fit gap-5'}>
                 {processedNodeData && <CollapsibleNode node_data={processedNodeData} onRefresh={refreshNodeTree}/>}
