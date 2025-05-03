@@ -1,63 +1,64 @@
 import {Tooltip} from "react-tooltip";
 
-export type ProgressProps = {
-    progress: { completed: number; ongoing: number; missed: number }
-}
+export const ProgressBar = ({ progress }: ProgressProps) => {
+  const total_subtasks: number = progress.completed + progress.ongoing + progress.missed;
 
-export const ProgressBar = ({progress}: ProgressProps) => {
-    const total_subtasks: number = progress.completed + progress.ongoing + progress.missed;
-    return <div className="h-full">
-        <div className="flex flex-row h-full w-full max-w-md rounded-full overflow-hidden border border-black">
-            {progress.completed > 0 &&
-            <div
-                data-tooltip-id={'finished_tooltip'}
-                data-tooltip-content={`${progress.completed}/${total_subtasks} Finished`}
-                data-tooltip-delay-show={200}
-                data-tooltip-delay-hide={200}
-                data-tooltip-place={"bottom"}
-                data-tooltip-class-name="text-red"
-                className="bg-uranian-blue h-full cursor-pointer hover:shadow-lg border-r border-black"
-                style={{
-                    width: `${(progress.completed / total_subtasks) * 100}%`
-                }}
-                onClick={(e) => {
+  return (
+      <div className="h-full w-full overflow-hidden">
+        <div className="flex flex-row h-full w-full max-w-full rounded-full overflow-hidden border border-black">
+          {progress.completed > 0 && (
+              <div
+                  data-tooltip-id={"finished_tooltip"}
+                  data-tooltip-content={`${progress.completed}/${total_subtasks} Finished`}
+                  data-tooltip-delay-show={200}
+                  data-tooltip-delay-hide={200}
+                  data-tooltip-place={"bottom"}
+                  className="bg-uranian-blue h-full cursor-pointer hover:shadow-lg border-r border-black"
+                  style={{
+                    width: `${(progress.completed / total_subtasks) * 100}%`,
+                    minWidth: 0, // Prevents overflow
+                  }}
+                  onClick={(e) => {
                     e.stopPropagation();
-                }}
-            />}
+                  }}
+              />
+          )}
 
-            {progress.ongoing > 0 &&
-            <div
-                data-tooltip-id={'ongoing_tooltip'}
-                data-tooltip-content={`${progress.ongoing}/${total_subtasks} In Progress`}
-                data-tooltip-delay-show={200}
-                data-tooltip-delay-hide={200}
-                data-tooltip-place={"bottom"}
-                data-tooltip-class-name="text-red"
-                className="bg-icterine h-full cursor-pointer"
-                style={{
-                    width: `${(progress.ongoing / total_subtasks) * 100}%`
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-            />}
+          {progress.ongoing > 0 && (
+              <div
+                  data-tooltip-id={"ongoing_tooltip"}
+                  data-tooltip-content={`${progress.ongoing}/${total_subtasks} In Progress`}
+                  data-tooltip-delay-show={200}
+                  data-tooltip-delay-hide={200}
+                  data-tooltip-place={"bottom"}
+                  className="bg-icterine h-full cursor-pointer"
+                  style={{
+                    width: `${(progress.ongoing / total_subtasks) * 100}%`,
+                    minWidth: 0, // Prevents overflow
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+              />
+          )}
 
-            {progress.missed > 0 &&
-            <div
-                data-tooltip-id={'missed_tooltip'}
-                data-tooltip-content={`${progress.missed}/${total_subtasks} Missed`}
-                data-tooltip-delay-show={200}
-                data-tooltip-delay-hide={200}
-                data-tooltip-place={"bottom"}
-                data-tooltip-class-name="text-red"
-                className="bg-pastel-red h-full cursor-pointer"
-                style={{
-                    width: `${(progress.missed / total_subtasks) * 100}%`
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-            />}
+          {progress.missed > 0 && (
+              <div
+                  data-tooltip-id={"missed_tooltip"}
+                  data-tooltip-content={`${progress.missed}/${total_subtasks} Missed`}
+                  data-tooltip-delay-show={200}
+                  data-tooltip-delay-hide={200}
+                  data-tooltip-place={"bottom"}
+                  className="bg-pastel-red h-full cursor-pointer"
+                  style={{
+                    width: `${(progress.missed / total_subtasks) * 100}%`,
+                    minWidth: 0, // Prevents overflow
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+              />
+          )}
         </div>
         <Tooltip
             id="finished_tooltip"
@@ -101,4 +102,5 @@ export const ProgressBar = ({progress}: ProgressProps) => {
             }}
         />
     </div>
+    );
 }
