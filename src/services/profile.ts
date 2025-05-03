@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../constants';
+import {getAuthToken, HeaderAuth} from "./auth.ts";
 
 export interface UserProfile {
   id: number;
@@ -30,19 +31,10 @@ export interface PublicUserProfile {
 }
 
 export const getUserProfile = async (): Promise<UserProfile> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/account/`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: await HeaderAuth()
     });
     
     if (!response.ok) {
@@ -59,19 +51,10 @@ export const getUserProfile = async (): Promise<UserProfile> => {
 };
 
 export const getUserProfileById = async (userId: number): Promise<CollaboratorProfile> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/profile/${userId}/`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: await HeaderAuth()
     });
     
     if (!response.ok) {
@@ -89,19 +72,10 @@ export const getUserProfileById = async (userId: number): Promise<CollaboratorPr
 
 
 export const getCompleteProfile = async (): Promise<CompleteUserProfile> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/complete-profile/`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: await HeaderAuth()
     });
     
     if (!response.ok) {
@@ -120,17 +94,11 @@ export const getCompleteProfile = async (): Promise<CompleteUserProfile> => {
 
 // Updated to work with CompleteUserProfile type
 export const updateUserProfile = async (formData: FormData): Promise<CompleteUserProfile> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/account/`, {
       method: 'PATCH',
       headers: {
-        'Authorization': `Token ${token}`
+        'Authorization': `Bearer ${await getAuthToken()}`
       },
       body: formData
     });
@@ -150,19 +118,10 @@ export const updateUserProfile = async (formData: FormData): Promise<CompleteUse
 
 
 export const changePassword = async (currentPassword: string, newPassword: string): Promise<void> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/change-password/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: await HeaderAuth(),
       body: JSON.stringify({
         current_password: currentPassword,
         new_password: newPassword
@@ -180,19 +139,10 @@ export const changePassword = async (currentPassword: string, newPassword: strin
 };
 
 export const getAllUserProfiles = async (): Promise<PublicUserProfile[]> => {
-  const token = localStorage.getItem('authToken');
-
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-
   try {
     const response = await fetch(`${API_BASE_URL}/api/user-profiles/`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: await HeaderAuth()
     });
 
     if (!response.ok) {
@@ -210,19 +160,10 @@ export const getAllUserProfiles = async (): Promise<PublicUserProfile[]> => {
 
 
 export const searchUsers = async (query: string): Promise<PublicUserProfile[]> => {
-  const token = localStorage.getItem('authToken');
-
-  if (!token) {
-    throw new Error("Authentication token not found");
-  }
-
   try {
     const response = await fetch(`${API_BASE_URL}/api/search-users/?q=${encodeURIComponent(query)}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await HeaderAuth()
     });
 
     if (!response.ok) {
