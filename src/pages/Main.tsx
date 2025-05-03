@@ -308,7 +308,15 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
     return (
         <main className={'flex flex-col items-center justify-center w-full'}>
             <div className={'flex flex-row justify-center w-full gap-6 mb-6 p-4 bg-gray-50 rounded-lg shadow-sm'}>
+                {/* Back to Home Button */}
+                <button
+                    onClick={() => navigate('/home')}
+                    className=" px-4 py-2 text-palm-blue rounded-md hover:bg-uranian-blue transition flex flex-row items-center gap-2">
+                    <MdArrowBackIos/> <span>Home</span>
+                </button>
                 <div className="flex items-center">
+                    
+
                     <label htmlFor="sort-select" className="mr-2 font-medium flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
@@ -323,6 +331,7 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                         <option value="deadline">⏰ Deadline (nearest first)</option>
                         <option value="priority">🔥 Priority (highest first)</option>
                     </select>
+                    
                 </div>
 
                 <div className="flex items-center">
@@ -344,12 +353,7 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                     </select>
                 </div>
             </div>
-            {/* Back to Home Button */}
-            <button
-                onClick={() => navigate('/home')}
-                className="mt-6 px-4 py-2 bg-uranian-blue text-palm-blue rounded-md shadow hover:bg-carribean-current transition flex flex-row items-center gap-2 absolute left-4 top-20">
-                <MdArrowBackIos/> <span>Home</span>
-            </button>
+            
             
             <div className={'flex flex-col items-center justify-center w-fit gap-5'}>
                 {processedNodeData && <CollapsibleNode node_data={processedNodeData} onRefresh={refreshNodeTree}/>}
