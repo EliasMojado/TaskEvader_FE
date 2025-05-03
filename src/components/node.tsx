@@ -16,7 +16,9 @@ import {IoIosCheckboxOutline, IoMdTrash} from "react-icons/io";
 import {AiFillFileAdd, AiOutlineCloseSquare} from "react-icons/ai";
 import CreateSubtaskForm from "./CreateSubtaskForm.tsx";
 import EditNodeForm from './EditNodeForm.tsx';
-import { deleteNode } from "../services/nodes";
+import {deleteNode, updateNode} from "../services/nodes";
+import {Tooltip} from "react-tooltip";
+import {getUserProfileById} from "../services/profile.ts";
 
 export type NodeData = {
   id: number;
@@ -58,20 +60,36 @@ const IconsMap: Icons = {
 
 export const Node: React.FC<{
   isCollapsed?: boolean,
-  node_data: NodeData,
+  nodeData: NodeData,
   setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>,
   isHomePage?: boolean,
   loadChildren?: () => Promise<void>,
   onRefresh?: () => void
-}> = ({isCollapsed = false, node_data, setIsCollapsed, isHomePage = false, loadChildren, onRefresh}) => {
+}> = ({isCollapsed = false, nodeData, setIsCollapsed, isHomePage = false, loadChildren, onRefresh}) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showEditProject, setShowEditProject] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [collaborators, setCollaborators] = useState<CollaboratorProfile[]>([]);
+  const [node_data, setNodeData] = useState<NodeData>(nodeData);
   const navigate = useNavigate();
   const key = node_data.id;
   const isLeaf = !(node_data.completed_subtasks || node_data.ongoing_subtasks || node_data.missed_subtasks);
+
+  useEffect(() => {
+    const fetchCollaborators = async () => {
+      const collaboratorProfiles = await Promise.all(
+          node_data.collaborators.map(async (id: number) => {
+            const profile = await getUserProfileById(id); // Fetch profile data
+            return profile;
+          })
+      );
+      setCollaborators(collaboratorProfiles);
+    };
+
+    fetchCollaborators();
+  }, [node_data.collaborators]);
 
   const handleDelete = async () => {
     // Example: call your backend API to delete the node
@@ -110,8 +128,8 @@ export const Node: React.FC<{
             setHovered(false);
             setShowOptions(false);
           }}
-          className={`flex mb-2 flex-row w-full items-center gap-2 relative border cursor-pointer hover:shadow-lg transition-all duration-200
-                    ${node_data.parent == null ? 'rounded-lg px-6 py-4 border-palm-blue mt-5' : 'rounded-lg px-6 py-2 border-carribean-current'}`}
+          className={`flex flex-row w-full items-center relative border cursor-pointer hover:shadow-lg my-2 select-none
+                    ${node_data.parent == null ? 'rounded-lg px-6 py-4 max-w-fit border-palm-blue mt-5' : 'rounded-lg px-6 py-2 border-carribean-current'}`}
       >
         {
           /*
@@ -159,7 +177,7 @@ export const Node: React.FC<{
               */
             }
 
-            <div className={'flex flex-col items-center justify-center'}>
+            <div className={'flex flex-col items-center justify-center select-none'}>
               {node_data.icon ? (
                 // If icon is available, render the emoji with appropriate size
                 <span className={
@@ -199,7 +217,7 @@ export const Node: React.FC<{
                   - Collaborators
                 */
               }
-              <div className={`flex ${node_data.parent != null ? 'flex-row items-center gap-2' : 'flex-col'}`}>
+              <div className={`flex ${node_data.parent != null ? 'flex-row items-center gap-2' : 'flex-col '}`}>
 
                 {
                   /*
@@ -207,19 +225,25 @@ export const Node: React.FC<{
                   */
                 }
                 <h1
-                    className={`w-fit font-inter ${
-                      node_data.parent == null 
-                        ? isHomePage 
-                          ? 'font-bold text-l leading-none ' 
-                          : 'font-medium text-3xl' 
-                        : 'font-medium text-sm'
-                      } text-palm-blue ${
+                    className={`w-fit font-inter select-none ${
+                        node_data.parent == null
+                            ? isHomePage
+                                ? 'font-bold text-l leading-none'
+                                : 'font-medium text-3xl whitespace-nowrap'
+                            : 'font-medium text-sm leading-none'
+                    } text-palm-blue ${
                         node_data.status === STATUS.completed ? 'line-through' : ''
-                      }`}
-                    style={isHomePage ? {
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    } : {}}
+                    }`}
+                    style={{
+                      marginBottom: '0.5rem', // Adds spacing below the title
+                      lineHeight: isHomePage ? '1.2' : '1.5', // Adjusts line height for better spacing
+                      ...(isHomePage
+                          ? {
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }
+                          : {}),
+                    }}
                 >
                   {node_data["title"]}
                 </h1>
@@ -230,22 +254,81 @@ export const Node: React.FC<{
                     - Collaborators
                   */
                 }
-                <div className={'flex flex-row items-center gap-1'}>
+                <div className={'flex flex-row gap-1 w-full h-full items-center'}>
                   <span className={`w-fit h-fit px-4 py-0.5 whitespace-nowrap ${node_data.parent == null ? 'text-[10px]' : 'text-[7px]'} 
                   rounded-2xl text-palm-blue bg-uranian-blue font-viga flex flex-row items-center justify-center gap-1`}>
                     <TbCalendarClock/>
                     <span>
-                      {/* {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString()} */}
                       {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US', {timeZoneName: 'short'})}
                     </span>
                   </span>
-                  <span className={'flex flex-row'}>
-                    {node_data['collaborators'].map((profile: CollaboratorProfile) => (
-                    <div key={profile.id} className={`${node_data.parent == null ? 'w-5 h-5' : 'w-3 h-3'} rounded-full border border-white 
-                      overflow-hidden items-center justify-center flex bg-gray-300`}>
-                      <MdPerson/>
-                    </div>
+                  <span className={'flex flex-row items-center h-full'}>
+                  {collaborators.slice(0, 3).map((profile) => (
+                      <div
+                          key={profile.id}
+                          data-tooltip-id={`collaborator-${profile.id}`}
+                          data-tooltip-content={`${profile.display_name}`}
+                          data-tooltip-delay-show={200}
+                          data-tooltip-delay-hide={200}
+                          data-tooltip-place={"bottom"}
+                          className={`flex items-center justify-center rounded-full overflow-hidden`}
+                          style={{
+                            width: isLeaf ? 15 : 20,
+                            height: isLeaf ? 15 : 20,
+                          }}
+                      >
+                        {profile.profile_pic ? (
+                            <img
+                                src={profile.profile_pic}
+                                width="100%"
+                                height="100%"
+                                className="object-cover"
+                            />
+                        ) : (
+                            <MdPerson size={isLeaf ? 15 : 20} color={'darkgrey'}/>
+                        )}
+                        <Tooltip
+                            id={`collaborator-${profile.id}`}
+                            style={{
+                              backgroundColor: "white",
+                              color: "#197278",
+                              padding: "8px 12px",
+                              borderRadius: "6px",
+                              fontWeight: "bold",
+                              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                              fontSize: "12px",
+                              zIndex: 10,
+                            }}
+                        />
+                      </div>
                   ))}
+                    {collaborators.length > 3 && (
+                        <div
+                            data-tooltip-id="extra-collaborators-tooltip"
+                            data-tooltip-content={collaborators.slice(3).map((profile) => profile.display_name).join(', ')}
+                            data-tooltip-delay-show={200}
+                            data-tooltip-delay-hide={200}
+                            data-tooltip-place={"bottom"}
+                            className={`rounded-full bg-gray-300 text-black text-[10px] flex items-center justify-center border-2 border-white ${
+                                isLeaf ? 'w-6 h-6' : 'w-5 h-5'
+                            }`}
+                        >
+                          +{collaborators.length - 3}
+                        </div>
+                    )}
+                    <Tooltip
+                        id="extra-collaborators-tooltip"
+                        style={{
+                          backgroundColor: "white",
+                          color: "#197278",
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          fontWeight: "bold",
+                          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                          fontSize: "12px",
+                          zIndex: 10
+                        }}
+                    />
                 </span>
                 </div>
               </div>
@@ -270,7 +353,7 @@ export const Node: React.FC<{
           </div>
 
           {node_data.parent == null &&
-              <div className={'h-3'}>
+              <div className={'h-3 w-full'}>
                   <ProgressBar progress={
                     {
                       completed: node_data.completed_subtasks,
@@ -281,13 +364,34 @@ export const Node: React.FC<{
               </div>
           }
         </div>
-        <div></div>
         {isLeaf &&
-        <div>
+        <div className={'w-full justify-end items-end flex flex-row'}>
           {node_data.status == STATUS.ongoing &&
-              <MdOutlineCheckBoxOutlineBlank size={node_data.parent == null ? 20 : 13} color={'#001F54'}/>}
-          {node_data.status == STATUS.completed && <IoIosCheckboxOutline size={node_data.parent == null ? 20 : 13} color={'#197278'}/>}
-          {node_data.status == STATUS.missed && <AiOutlineCloseSquare size={node_data.parent == null ? 20 : 13} color={'#F33D3A'}/>}
+              <MdOutlineCheckBoxOutlineBlank
+                  onClick={async () => {
+                    try {
+                      await updateNode(node_data.id, { status: 'done' });
+                      setNodeData({ ...node_data, status: 'done' });
+                    } catch (error) {
+                      console.error('Failed to update node:', error);
+                    }
+                  }}
+                  size={node_data.parent == null ? 20 : 15} color={'#001F54'}
+              />
+          }
+          {node_data.status == STATUS.completed &&
+              <IoIosCheckboxOutline
+                  onClick={async () => {
+                    try {
+                      await updateNode(node_data.id, { status: 'ongoing' });
+                      setNodeData({ ...node_data, status: 'ongoing' });
+                    } catch (error) {
+                      console.error('Failed to update node:', error);
+                    }
+                  }}
+                  size={node_data.parent == null ? 20 : 15} color={'#197278'}/>}
+          {node_data.status == STATUS.missed &&
+              <AiOutlineCloseSquare size={node_data.parent == null ? 20 : 13} color={'#F33D3A'}/>}
         </div>
         }
 
@@ -302,16 +406,15 @@ export const Node: React.FC<{
                   setHovered(false)
                 }}/>
           {showOptions &&
-              <div className={'absolute left-1 flex flex-col gap-2 bg-white rounded-xl border shadow-lg p-4'} 
+              <div className={'absolute left-1 flex flex-col gap-1 bg-white rounded-xl border shadow-lg p-2'}
                   onClick={(e) => e.stopPropagation()}>
-                  <h1 className={'text-palm-blue font-inter font-bold text-sm'}>Actions</h1>
-
-                  <div className={'flex flex-row items-center gap-2 cursor-pointer'}
+                  <h1 className={'text-palm-blue font-inter font-bold text-sm pl-1 border-b-2 mb-1 pb-1'}>Actions</h1>
+                  <div className={'flex flex-row items-center gap-2 cursor-pointer hover:bg-uranian-blue pr-4 pl-1 py-1 rounded-md'}
                       onClick={() => setShowCreateProject(true)}>
                       <AiFillFileAdd size={15} color={'#197278'}/>
                       <span className={'text-palm-blue font-inter font-medium text-sm'}>Add</span>
                   </div>
-                  <div className={'flex flex-row items-center gap-2'}
+                  <div className={'flex flex-row items-center gap-2 cursor-pointer hover:bg-uranian-blue pr-4 pl-1 py-1 rounded-md'}
                       onClick={() => {
                         setShowEditProject(true);
                         setShowOptions(false);
@@ -320,7 +423,7 @@ export const Node: React.FC<{
                       <span className={'text-palm-blue font-inter font-medium text-sm'}>Edit</span>
                   </div>
                   <div
-                    className={'flex flex-row items-center gap-2 cursor-pointer'}
+                    className={'flex flex-row items-center gap-2 cursor-pointer hover:bg-uranian-blue pr-4 pl-1 py-1 rounded-md'}
                     onClick={() => setShowDeleteConfirm(true)}
                   >
                     <IoMdTrash size={15} color={'#FC7554'} />
