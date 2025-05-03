@@ -3,6 +3,9 @@ import { Node, NodeData } from "./node.tsx";
 
 export const CollapsibleNode: React.FC<{ node_data: NodeData; onRefresh?: () => void }> = ({ node_data, onRefresh }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  
+  // Check if this is a root node
+  const isRootNode = node_data.parent === null;
 
   return (
       <div className={`flex flex-col w-full h-full min-h-fit relative`}>
@@ -23,18 +26,22 @@ export const CollapsibleNode: React.FC<{ node_data: NodeData; onRefresh?: () => 
         </div>
 
         {isCollapsed && node_data.children && node_data.children.length > 0 && (
-            <div className="relative ml-10">
+            <div className={`relative ml-10 ${isRootNode ? 'root-children' : ''}`}>
+            
               {node_data.children.map((child, index) => {
                 const childData = { ...child };
                 if (!childData.icon) {
                   childData.icon_id = 1;
                 }
+                const isLastChild = index === node_data.children.length - 1;
+                
                 return (
                     <div
                         key={childData.id}
                         className={`relative flex flex-row items-center h-full child-${childData.id}-${index}`}
                     >
-                      {node_data.parent !== null && index < node_data.children.length - 1 && (
+                      {/* Show vertical connector line for all but the last child */}
+                      {!isLastChild && (
                           <div className={`border-palm-blue absolute h-full -left-6 border-l`}></div>
                       )}
                       <CollapsibleNode node_data={childData} onRefresh={onRefresh} />
