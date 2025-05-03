@@ -6,6 +6,8 @@ import logo from '../../public/logo.png';
 import CreateProject from '../components/CreateProject'; // Import the CreateProject component
 import {Node as NodeCard, NodeData} from '../components/node';
 import {MdPerson} from "react-icons/md"; // Import the Node component
+import { STATUS } from "../constants/index.ts";
+
 // Define status type for better type safety
 type Status = 'all' | 'ongoing' | 'missed' | 'completed';
 
@@ -124,7 +126,9 @@ const Home: React.FC = () => {
 
     // Filter nodes based on selected status
     const filteredNodes : NodeData[] = status === 'all'
-        ? nodes 
+    ? nodes 
+    : status === 'completed'
+        ? nodes.filter(node => node.status === 'done' || node.status === STATUS.completed)
         : nodes.filter(node => node.status === status);
 
     if (loading) {
