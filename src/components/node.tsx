@@ -372,19 +372,45 @@ export const Node: React.FC<{
                     try {
                       await updateNode(node_data.id, { status: 'done' });
                       setNodeData({ ...node_data, status: 'done' });
+                      // Trigger parent refresh to update its completed_subtasks count
+                      onRefresh?.();
                     } catch (error) {
                       console.error('Failed to update node:', error);
                     }
                   }}
-                  size={node_data.parent == null ? 20 : 15} color={'#001F54'}
+                  size={20}
+                  color={'#3F3D56'}
+                  className={'cursor-pointer'}
+              />
+          }
+          {node_data.status == STATUS.done &&
+              <MdOutlineCheckBox
+                  onClick={async (e) => {
+                    // Stop event propagation to prevent the parent node toggle
+                    e.stopPropagation();
+                    try {
+                      await updateNode(node_data.id, { status: 'ongoing' });
+                      setNodeData({ ...node_data, status: 'ongoing' });
+                      // Ensure onRefresh is called
+                      onRefresh?.();
+                    } catch (error) {
+                      console.error('Failed to update node:', error);
+                    }
+                  }}
+                  size={20}
+                  color={'#3F3D56'}
+                  className={'cursor-pointer'}
               />
           }
           {node_data.status == STATUS.completed &&
               <IoIosCheckboxOutline
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.stopPropagation();
                     try {
                       await updateNode(node_data.id, { status: 'ongoing' });
                       setNodeData({ ...node_data, status: 'ongoing' });
+                      // Add onRefresh here too
+                      onRefresh?.();
                     } catch (error) {
                       console.error('Failed to update node:', error);
                     }
