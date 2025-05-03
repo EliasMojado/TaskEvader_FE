@@ -219,19 +219,19 @@ const Home: React.FC = () => {
                             : `You don't have any ${status} projects.`}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {
-                            filteredNodes.map(node => {
-                                if (!node.icon) {
-                                    node['icon_id'] = 1;
-                                }
-                                return <NodeCard
+                    <div className="flex flex-wrap gap-4 justify-center min-w-fit">
+                        {filteredNodes.map(node => {
+                            if (!node.icon) {
+                                node['icon_id'] = 1;
+                            }
+                            return (
+                                <NodeCard
                                     nodeData={node}
                                     key={node.id}
                                     isHomePage={true}
                                 />
-                        }
-                        )}
+                            );
+                        })}
                     </div>
                 )}
             </div>
