@@ -258,7 +258,7 @@ export const Node: React.FC<{
                 }
                 <div className={'flex flex-row gap-1 w-full h-full items-center'}>
                   <span
-                      className={`w-fit h-fit px-4 py-0.5 whitespace-nowrap ${node_data.parent == null ? 'text-[10px]' : 'text-[7px]'} 
+                      className={`w-fit h-fit px-4 whitespace-nowrap ${node_data.parent == null ? 'text-[12px]' : 'text-[10px]'} 
                   rounded-2xl text-palm-blue bg-uranian-blue font-viga flex flex-row items-center justify-center gap-1`}>
                     <TbCalendarClock/>
                     <span>
