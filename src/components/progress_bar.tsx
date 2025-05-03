@@ -1,5 +1,13 @@
 import {Tooltip} from "react-tooltip";
 
+type ProgressProps = {
+  progress: {
+    completed: number;
+    ongoing: number;
+    missed: number;
+  };
+}
+
 export const ProgressBar = ({ progress }: ProgressProps) => {
   const total_subtasks: number = progress.completed + progress.ongoing + progress.missed;
 
@@ -63,13 +71,12 @@ export const ProgressBar = ({ progress }: ProgressProps) => {
         <Tooltip
             id="finished_tooltip"
             style={{
-                backgroundColor: "white",
-                color: "#197278",
-                padding: "8px 12px",
+                backgroundColor: "#B4D3F9",
+                color: "#001F54",
+                padding: "8px 10px",
                 borderRadius: "6px",
-                fontWeight: "bold",
                 boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                fontSize: "12px",
+                fontSize: "10px",
                 zIndex: 10
             }}
         />
