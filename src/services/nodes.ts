@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '../constants';
 import {getUserProfileById} from "./profile.ts";
+import {HeaderAuth} from "./auth.ts";
 
 export interface Node {
   id: number;
@@ -31,19 +32,10 @@ export interface CreateNodePayload {
 }
 
 export const getRootNodes = async (): Promise<Node[]> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  
   try {
     const response = await fetch(`${API_BASE_URL}/api/nodes/roots/`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: await HeaderAuth(),
     });
     
     if (!response.ok) {
@@ -61,19 +53,11 @@ export const getRootNodes = async (): Promise<Node[]> => {
 
 // Add this new function to get a specific node by ID
 export const getNodeData = async (id: number | string): Promise<Node> => {
-  const token = localStorage.getItem('authToken');
-  
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
   
   try {
     const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      }
+      headers: await HeaderAuth()
     });
     
     if (!response.ok) {
@@ -90,21 +74,10 @@ export const getNodeData = async (id: number | string): Promise<Node> => {
 };
 
 export const createNode = async (payload: CreateNodePayload): Promise<Node> => {
-  const token = localStorage.getItem('authToken');
-
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-
-  console.log("Creating node with payload:", payload);  // Log the payload for debugging
-
   try {
     const response = await fetch(`${API_BASE_URL}/api/nodes/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await HeaderAuth(),
       body: JSON.stringify(payload),
     });
 
@@ -123,19 +96,10 @@ export const createNode = async (payload: CreateNodePayload): Promise<Node> => {
 };
 
 export const deleteNode = async (id: number | string): Promise<void> => {
-  const token = localStorage.getItem('authToken');
-
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-
   try {
     const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await HeaderAuth(),
     });
 
     if (!response.ok) {
@@ -180,19 +144,10 @@ export const fetchSpecificNodeWithCollaborator = async (id: number) => {
 };
 
 export const updateNode = async (id: number, payload: Partial<Node>): Promise<Node> => {
-  const token = localStorage.getItem('authToken');
-
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-
   try {
     const response = await fetch(`${API_BASE_URL}/api/nodes/${id}/`, {
       method: 'PATCH',
-      headers: {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await HeaderAuth(),
       body: JSON.stringify(payload),
     });
 
