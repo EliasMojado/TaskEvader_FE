@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
     try {
       const data = await login(username, password)
       // store token somewhere simple
-      localStorage.setItem('authToken', data.token)
+      localStorage.setItem('authToken', data.access)
 
       // redirect to your protected route
       navigate('/home')
