@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getUserProfile, UserProfile, getUserProfileById } from '../services/profile';
 import { getRootNodes } from '../services/nodes';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import logo from '../../public/logo.png';
 import CreateProject from '../components/CreateProject'; // Import the CreateProject component
-import {Node as NodeCard, NodeData} from '../components/node'; // Import the Node component
-import { useNavigate } from 'react-router-dom';
-
+import {Node as NodeCard, NodeData} from '../components/node';
+import {MdPerson} from "react-icons/md"; // Import the Node component
 // Define status type for better type safety
 type Status = 'all' | 'ongoing' | 'missed' | 'completed';
 
@@ -32,9 +31,6 @@ const Home: React.FC = () => {
         } catch (err: unknown) {
             console.error('Failed to fetch profile:', err);
             setError(err.message || 'Failed to load user profile');
-
-            localStorage.removeItem('authToken');
-            navigate('/login');
         } finally {
             setLoading(false);
         }
@@ -154,11 +150,12 @@ const Home: React.FC = () => {
                         onClick={() => navigate('/profile')}
                         title='Go to Profile'
                     >
+                        {profile.profile_pic ?
                         <img 
                             src={profile.profile_pic} 
                             alt="Profile Picture" 
                             className="w-[3em] h-[3em] rounded-full object-cover"
-                        />
+                        /> : <MdPerson size={50} color={'darkgrey'}/>}
                     </div>
                 )}
             </div>
@@ -225,7 +222,7 @@ const Home: React.FC = () => {
                                     node['icon_id'] = 1;
                                 }
                                 return <NodeCard
-                                    node_data={node}
+                                    nodeData={node}
                                     key={node.id}
                                     isHomePage={true}
                                 />
