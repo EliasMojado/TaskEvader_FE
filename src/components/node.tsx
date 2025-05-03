@@ -128,6 +128,10 @@ export const Node: React.FC<{
             setHovered(false);
             setShowOptions(false);
           }}
+          data-tooltip-id={`node-description-${node_data.id}`}
+          data-tooltip-content={node_data.description || "No description available"}
+          data-tooltip-delay-show={400}
+          data-tooltip-place="bottom"
           className={`flex flex-row w-full items-center relative border cursor-pointer hover:shadow-lg my-2 select-none
                     ${node_data.parent == null ? 'rounded-lg px-6 py-4 max-w-fit border-palm-blue mt-5' : 'rounded-lg px-6 py-2 border-carribean-current'}`}
       >
@@ -539,7 +543,22 @@ export const Node: React.FC<{
             </div>
           </div>
         )}
-
+        <Tooltip
+            id={`node-description-${node_data.id}`}
+            style={{
+                backgroundColor: "white",
+                color: "#197278",
+                padding: "12px 16px",
+                borderRadius: "6px",
+                fontWeight: "normal",
+                maxWidth: "300px",
+                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                fontSize: "14px",
+                zIndex: 10,
+                whiteSpace: "pre-wrap",
+                textAlign: "left"
+            }}
+        />
       </main>
   );
 };
