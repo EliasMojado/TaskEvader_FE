@@ -315,8 +315,6 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                     <MdArrowBackIos/> <span>Home</span>
                 </button>
                 <div className="flex items-center">
-                    
-
                     <label htmlFor="sort-select" className="mr-2 font-medium flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
@@ -331,7 +329,6 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                         <option value="deadline">⏰ Deadline (nearest first)</option>
                         <option value="priority">🔥 Priority (highest first)</option>
                     </select>
-                    
                 </div>
 
                 <div className="flex items-center">
@@ -353,8 +350,6 @@ const Main: React.FC<{ isCollapsed?: boolean }> = () => {
                     </select>
                 </div>
             </div>
-            
-            
             <div className={'flex flex-col items-center justify-center w-fit gap-5'}>
                 {processedNodeData && <CollapsibleNode node_data={processedNodeData} onRefresh={refreshNodeTree}/>}
             </div>
