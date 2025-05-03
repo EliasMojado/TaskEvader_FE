@@ -1,48 +1,48 @@
-import React, {useState, useEffect} from "react";
+import React, { useState } from "react";
 import { Node, NodeData } from "./node.tsx";
 
 export const CollapsibleNode: React.FC<{ node_data: NodeData; onRefresh?: () => void }> = ({ node_data, onRefresh }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
-  // Log the node data structure for debugging
-  useEffect(() => {
-    console.log(`Rendering CollapsibleNode for ${node_data.title}`, node_data);
-  }, [node_data]);
-
-  // We don't need to fetch children since they are already in the node_data
-  // This is just a placeholder function to satisfy the Node component prop
-  const loadChildren = () => {
-    // Children are already loaded and included in node_data
-    console.log("Children already loaded in node_data:", node_data.children);
-  };
-
   return (
-    <div className="flex flex-col w-full relative">
-      <Node
-          isCollapsed={isCollapsed}
-          setIsCollapsed={setIsCollapsed}
-          node_data={node_data}
-          loadChildren={loadChildren}
-          onRefresh={onRefresh}
-      />
-
-      {isCollapsed && node_data.children && node_data.children.length > 0 && (
-        <div className="pl-10 ml-4 relative">
-          {/* Render children directly from node_data.children */}
-          {node_data.children.map((child) => {
-            // Only set icon_id if icon is not available as fallback
-            const childData = {...child};
-            if (!childData.icon) {
-              childData.icon_id = 1;
-            }
-            return (
-              <div key={childData.id} className="relative">
-                <CollapsibleNode node_data={childData} onRefresh={onRefresh} />
+      <div className={`flex flex-col w-full h-full min-h-fit relative`}>
+        <div className="flex flex-row items-center h-full">
+          {node_data.parent !== null && (
+              <div
+                  className={`border-palm-blue border-l border-b w-6 h-10 absolute -left-10 -top-2 rounded-bl-xl ml-4`}
+              >
+                {/* This is the line that connects to the parent node */}
               </div>
-            );
-          })}
+          )}
+          <Node
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
+              nodeData={node_data}
+              onRefresh={onRefresh}
+          />
         </div>
-      )}
-    </div>
+
+        {isCollapsed && node_data.children && node_data.children.length > 0 && (
+            <div className="relative ml-10">
+              {node_data.children.map((child, index) => {
+                const childData = { ...child };
+                if (!childData.icon) {
+                  childData.icon_id = 1;
+                }
+                return (
+                    <div
+                        key={childData.id}
+                        className={`relative flex flex-row items-center h-full child-${childData.id}-${index}`}
+                    >
+                      {node_data.parent !== null && index < node_data.children.length - 1 && (
+                          <div className={`border-palm-blue absolute h-full -left-6 border-l`}></div>
+                      )}
+                      <CollapsibleNode node_data={childData} onRefresh={onRefresh} />
+                    </div>
+                );
+              })}
+            </div>
+        )}
+      </div>
   );
 };
