@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCompleteProfile, updateUserProfile, CompleteUserProfile } from '../services/profile';
 import logo from '../../public/logo.png';
+import {MdPerson} from "react-icons/md";
 
 const Profile: React.FC = () => {
   const [profile, setProfile] = useState<CompleteUserProfile | null>(null);
@@ -176,7 +177,7 @@ const Profile: React.FC = () => {
                 />
               ) : (
                 <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-gray-500 text-xl font-bold">{profile?.username?.charAt(0).toUpperCase()}</span>
+                  <MdPerson size={100} color={'darkgrey'}/>
                 </div>
               )}
             </div>
