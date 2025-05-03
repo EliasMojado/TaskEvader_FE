@@ -222,53 +222,47 @@ export const Node: React.FC<{
                 */
               }
               <div className={`flex ${node_data.parent != null ? 'flex-row items-center gap-2' : 'flex-col '}`}>
-
-                {
-                  /*
-                    - Title
-                  */
-                }
-                <h1
+                <div className={`flex flex-col ${node_data.parent != null ? '' : ''}`}>
+                  {/* Title */}
+                  <h1
                     className={`w-fit font-inter select-none ${
-                        node_data.parent == null
-                            ? isHomePage
-                                ? 'font-bold text-l leading-none'
-                                : 'font-medium text-3xl whitespace-nowrap'
-                            : 'font-medium text-sm leading-none'
+                      node_data.parent == null
+                        ? isHomePage
+                          ? 'font-bold text-l leading-none'
+                          : 'font-medium text-3xl whitespace-nowrap'
+                        : 'font-medium text-sm leading-none'
                     } text-palm-blue ${
-                        node_data.status === STATUS.completed ? 'line-through' : ''
+                      node_data.status === STATUS.completed ? 'line-through' : ''
                     }`}
                     style={{
-                      marginBottom: '0.5rem', // Adds spacing below the title
-                      lineHeight: isHomePage ? '1.2' : '1.5', // Adjusts line height for better spacing
+                      marginBottom: '0.25rem', // Reduced spacing for tighter layout
+                      lineHeight: isHomePage ? '1.2' : '1.5',
                       ...(isHomePage
-                          ? {
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }
-                          : {}),
+                        ? {
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }
+                        : {}),
                     }}
-                >
-                  {node_data["title"]}
-                </h1>
+                  >
+                    {node_data["title"]}
+                  </h1>
 
-                {
-                  /*
-                    - Deadline
-                    - Collaborators
-                  */
-                }
-                <div className={'flex flex-row gap-1 w-full h-full items-center'}>
-                  <span className={`w-fit h-fit px-4 py-0.5 whitespace-nowrap ${node_data.parent == null ? 'text-[10px]' : 'text-[7px]'} 
-                  rounded-2xl text-palm-blue bg-uranian-blue font-viga flex flex-row items-center justify-center gap-1`}>
-                    <TbCalendarClock/>
-                    <span>
-                      {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US', {timeZoneName: 'short'})}
+                  {/* Deadline and Collaborators in one row */}
+                  <div className='flex flex-row items-center gap-2 mb-2'>
+                    {/* Deadline */}
+                    <span className={`w-fit h-fit px-4 py-0.5 whitespace-nowrap ${node_data.parent == null ? 'text-[10px]' : 'text-[7px]'} 
+                      rounded-2xl text-palm-blue bg-uranian-blue font-viga flex flex-row items-center justify-center gap-1`}>
+                      <TbCalendarClock/>
+                      <span>
+                        {formatDateToLocale(node_data['deadline'])} | {new Date(node_data['deadline']).toLocaleTimeString('en-US', {timeZoneName: 'short'})}
+                      </span>
                     </span>
-                  </span>
-                  <span className={'flex flex-row items-center h-full'}>
-                  {collaborators.slice(0, 3).map((profile) => (
-                      <div
+                    
+                    {/* Collaborators */}
+                    <span className='flex flex-row items-center h-full'>
+                      {collaborators.slice(0, 3).map((profile) => (
+                        <div
                           key={profile.id}
                           data-tooltip-id={`collaborator-${profile.id}`}
                           data-tooltip-content={`${profile.display_name}`}
@@ -280,18 +274,18 @@ export const Node: React.FC<{
                             width: isLeaf ? 15 : 20,
                             height: isLeaf ? 15 : 20,
                           }}
-                      >
-                        {profile.profile_pic ? (
+                        >
+                          {profile.profile_pic ? (
                             <img
-                                src={profile.profile_pic}
-                                width="100%"
-                                height="100%"
-                                className="object-cover"
+                              src={profile.profile_pic}
+                              width="100%"
+                              height="100%"
+                              className="object-cover"
                             />
-                        ) : (
+                          ) : (
                             <MdPerson size={isLeaf ? 15 : 20} color={'darkgrey'}/>
-                        )}
-                        <Tooltip
+                          )}
+                          <Tooltip
                             id={`collaborator-${profile.id}`}
                             style={{
                               backgroundColor: "white",
@@ -303,24 +297,24 @@ export const Node: React.FC<{
                               fontSize: "12px",
                               zIndex: 10,
                             }}
-                        />
-                      </div>
-                  ))}
-                    {collaborators.length > 3 && (
+                          />
+                        </div>
+                      ))}
+                      {collaborators.length > 3 && (
                         <div
-                            data-tooltip-id="extra-collaborators-tooltip"
-                            data-tooltip-content={collaborators.slice(3).map((profile) => profile.display_name).join(', ')}
-                            data-tooltip-delay-show={200}
-                            data-tooltip-delay-hide={200}
-                            data-tooltip-place={"bottom"}
-                            className={`rounded-full bg-gray-300 text-black text-[10px] flex items-center justify-center border-2 border-white ${
-                                isLeaf ? 'w-6 h-6' : 'w-5 h-5'
-                            }`}
+                          data-tooltip-id="extra-collaborators-tooltip"
+                          data-tooltip-content={collaborators.slice(3).map((profile) => profile.display_name).join(', ')}
+                          data-tooltip-delay-show={200}
+                          data-tooltip-delay-hide={200}
+                          data-tooltip-place={"bottom"}
+                          className={`rounded-full bg-gray-300 text-black text-[10px] flex items-center justify-center border-2 border-white ${
+                            isLeaf ? 'w-6 h-6' : 'w-5 h-5'
+                          }`}
                         >
                           +{collaborators.length - 3}
                         </div>
-                    )}
-                    <Tooltip
+                      )}
+                      <Tooltip
                         id="extra-collaborators-tooltip"
                         style={{
                           backgroundColor: "white",
@@ -332,8 +326,9 @@ export const Node: React.FC<{
                           fontSize: "12px",
                           zIndex: 10
                         }}
-                    />
-                </span>
+                      />
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -353,23 +348,15 @@ export const Node: React.FC<{
                       }/>
                   </div>
               }
+
+              
             </div>
           </div>
 
-          {node_data.parent == null &&
-              <div className={'h-3 w-full'}>
-                  <ProgressBar progress={
-                    {
-                      completed: node_data.completed_subtasks,
-                      ongoing: node_data.ongoing_subtasks,
-                      missed: node_data.missed_subtasks
-                    } as ProgressProps
-                  }/>
-              </div>
-          }
+          
         </div>
         {isLeaf &&
-        <div className={'w-full justify-end items-end flex flex-row'}>
+        <div className={'w-full justify-end items-end flex flex-row ml-4'}>
           {node_data.status == STATUS.ongoing &&
               <MdOutlineCheckBoxOutlineBlank
                   onClick={async () => {
